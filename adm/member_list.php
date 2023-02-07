@@ -9,23 +9,28 @@ $authArray = ['일반회원', '기자', '미디어 관리자', '최고관리자'
 $sql_common = " from {$g5['member_table']} ";
 
 $sql_search = " where (1) ";
+
+$sfl = 'mb_name';
+
 if ($stx) {
+    // alert($stx);
     $sql_search .= " and ( ";
-    switch ($sfl) {
-        case 'mb_point':
-            $sql_search .= " ({$sfl} >= '{$stx}') ";
-            break;
-        case 'mb_level':
-            $sql_search .= " ({$sfl} = '{$stx}') ";
-            break;
-        case 'mb_tel':
-        case 'mb_hp':
-            $sql_search .= " ({$sfl} like '%{$stx}') ";
-            break;
-        default:
-            $sql_search .= " ({$sfl} like '{$stx}%') ";
-            break;
-    }
+    $sql_search .= " ({$sfl} like '{$stx}%') ";
+    // switch ($sfl) {
+    //     case 'mb_point':
+    //         $sql_search .= " ({$sfl} >= '{$stx}') ";
+    //         break;
+    //     case 'mb_level':
+    //         $sql_search .= " ({$sfl} = '{$stx}') ";
+    //         break;
+    //     case 'mb_tel':
+    //     case 'mb_hp':
+    //         $sql_search .= " ({$sfl} like '%{$stx}') ";
+    //         break;
+    //     default:
+    //         $sql_search .= " ({$sfl} like '{$stx}%') ";
+    //         break;
+    // }
     $sql_search .= " ) ";
 }
 
@@ -73,19 +78,19 @@ $colspan = 16;
 ?>
 
 <div class="local_ov01 local_ov">
-    <?php echo $listall ?>
+    <!-- <?php echo $listall ?> -->
     <span class="btn_ov01"><span class="ov_txt">총회원수 </span><span class="ov_num"> <?php echo number_format($total_count) ?>명 </span></span>
-    <a href="?sst=mb_intercept_date&amp;sod=desc&amp;sfl=<?php echo $sfl ?>&amp;stx=<?php echo $stx ?>" class="btn_ov01" data-tooltip-text="차단된 순으로 정렬합니다.&#xa;전체 데이터를 출력합니다."> <span class="ov_txt">차단 </span><span class="ov_num"><?php echo number_format($intercept_count) ?>명</span></a>
-    <a href="?sst=mb_leave_date&amp;sod=desc&amp;sfl=<?php echo $sfl ?>&amp;stx=<?php echo $stx ?>" class="btn_ov01" data-tooltip-text="탈퇴된 순으로 정렬합니다.&#xa;전체 데이터를 출력합니다."> <span class="ov_txt">탈퇴 </span><span class="ov_num"><?php echo number_format($leave_count) ?>명</span></a>
+    <!-- <a href="?sst=mb_intercept_date&amp;sod=desc&amp;sfl=<?php echo $sfl ?>&amp;stx=<?php echo $stx ?>" class="btn_ov01" data-tooltip-text="차단된 순으로 정렬합니다.&#xa;전체 데이터를 출력합니다."> <span class="ov_txt">차단 </span><span class="ov_num"><?php echo number_format($intercept_count) ?>명</span></a>
+    <a href="?sst=mb_leave_date&amp;sod=desc&amp;sfl=<?php echo $sfl ?>&amp;stx=<?php echo $stx ?>" class="btn_ov01" data-tooltip-text="탈퇴된 순으로 정렬합니다.&#xa;전체 데이터를 출력합니다."> <span class="ov_txt">탈퇴 </span><span class="ov_num"><?php echo number_format($leave_count) ?>명</span></a> -->
 </div>
 
 <form id="fsearch" name="fsearch" class="local_sch01 local_sch" method="get">
 
     <label for="sfl" class="sound_only">검색대상</label>
-    <select name="sfl" id="sfl">
-        <!-- <option value="mb_id" <?php echo get_selected($sfl, "mb_id"); ?>>회원아이디</option>
+    <!-- <select name="sfl" id="sfl">
+       <option value="mb_id" <?php echo get_selected($sfl, "mb_id"); ?>>회원아이디</option>
         <option value="mb_nick" <?php echo get_selected($sfl, "mb_nick"); ?>>닉네임</option> -->
-        <option value="mb_name" <?php echo get_selected($sfl, "mb_name"); ?>>이름</option>
+        <!-- <option value="mb_name" <?php echo get_selected($sfl, "mb_name"); ?>>이름</option> -->
         <!-- <option value="mb_level" <?php echo get_selected($sfl, "mb_level"); ?>>권한</option>
         <option value="mb_email" <?php echo get_selected($sfl, "mb_email"); ?>>E-MAIL</option>
         <option value="mb_tel" <?php echo get_selected($sfl, "mb_tel"); ?>>전화번호</option>
@@ -93,10 +98,10 @@ $colspan = 16;
         <option value="mb_point" <?php echo get_selected($sfl, "mb_point"); ?>>포인트</option>
         <option value="mb_datetime" <?php echo get_selected($sfl, "mb_datetime"); ?>>가입일시</option>
         <option value="mb_ip" <?php echo get_selected($sfl, "mb_ip"); ?>>IP</option>
-        <option value="mb_recommend" <?php echo get_selected($sfl, "mb_recommend"); ?>>추천인</option> -->
-    </select>
-    <label for="stx" class="sound_only">검색어<strong class="sound_only"> 필수</strong></label>
-    <input type="text" name="stx" value="<?php echo $stx ?>" id="stx" required class="required frm_input">
+        <option value="mb_recommend" <?php echo get_selected($sfl, "mb_recommend"); ?>>추천인</option> 
+    </select> -->
+    <!-- <label for="stx" class="sound_only">검색어<strong class="sound_only"> 필수</strong></label> -->
+    <input type="text" name="stx" value="<?php echo $stx ?>" id="stx" class="frm_input">
     <input type="submit" class="btn_submit" value="검색">
 
 </form>
@@ -168,12 +173,16 @@ $colspan = 16;
 
                     if ($row['mb_level'] > 8) {
                         $s_inf = '<a href="" class="btn btn_01">확인</a>';
+                        $s_inf = '<button id="select_'.$row['mb_id'].'" class="btn btn_01 btn-modal">확인</button>';
+                        
                         $s_mod = '';
                         $s_grp = '';
                     } else {
                         $s_inf = '';
                         $s_mod = '<a href="./member_form.php?' . $qstr . '&amp;w=u&amp;mb_id=' . $row['mb_id'] . '" class="btn btn_03">수정</a>';
+                        $s_mod = '<button id="modify_'.$row['mb_id'].'" class="btn btn_03 btn-modal">수정</button>';
                         $s_grp = '<a href="./boardgroupmember_form.php?mb_id=' . $row['mb_id'] . '" class="btn btn_02">삭제</a>';
+                        $s_grp = '<button id="delete_'.$row['mb_id'].'" class="btn btn_02 btn-modal">삭제</button>';
                     }
 
                     // if ($is_admin == 'group') {
@@ -292,8 +301,8 @@ $colspan = 16;
                         <!-- <td headers="mb_list_mobile" class="td_tel"><?php echo get_text($row['mb_hp']); ?></td>
                         <td headers="mb_list_lastcall" class="td_date"><?php echo substr($row['mb_today_login'], 2, 8); ?></td>
                         <td headers="mb_list_grp" class="td_numsmall"><?php echo $group ?></td> -->
-                        <!-- <td headers="mb_list_mng" rowspan="2" class="td_mng td_mng_s"><?php echo $s_mod ?><?php echo $s_grp ?></td> -->
-                    </tr> -->
+                        <!-- <td headers="mb_list_mng" rowspan="2" class="td_mng td_mng_s"><?php echo $s_mod ?><?php echo $s_grp ?></td> 
+                    </tr>-->
                     <tr class="<?php echo $bg; ?>">
                         <td headers="mb_list_name"><?php echo get_text($row['mb_no']);?></td>
                         <!-- <td headers="mb_list_nick" class="td_mbname"><?php echo get_text($row['mb_name']); ?></td> -->
@@ -358,6 +367,91 @@ $colspan = 16;
 
     </div>
 
+    <!-- <div id="container">
+        <button id="btn-modal">확인</button>
+    </div> -->
+
+    <div id="modal" class="modal-overlay">
+        <div class="modal-window">
+            <div class="title">
+                <h2 class="modal_title">회원정보 확인</h2>
+            </div>
+            <div class="close-area">X</div>
+            <div class="content">
+                <table>
+                    <th></th>
+                    <th></th>
+                    <tr>
+                        <td>
+                            <p>이름</p>
+                        </td>
+                        <td>
+                            <p class="modal_user_name"></p>
+                        </td>
+                        <td>
+                            <p>권한</p>
+                        </td>
+                        <td>
+                            <p class="modal_user_auth"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>ID</p>
+                        </td>
+                        <td>
+                            <p class="modal_user_id"></p>
+                        </td>
+                        <td>
+                            <p>이메일</p>
+                        </td>
+                        <td>
+                            <p class="modal_user_email"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>전화번호</p>
+                        </td>
+                        <td>
+                            <p class="modal_user_tel"></p>
+                        </td>
+                        <td>
+                            <p>휴대폰</p>
+                        </td>
+                        <td>
+                            <p class="modal_user_hp"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>주소</p>
+                        </td>
+                        <td>
+                            <p class="modal_user_addr"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>기사</p>
+                        </td>
+                        <td>
+                            <p class="modal_user_news"></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p>최근기사</p>
+                        </td>
+                        <td>
+                            <p class="modal_user_recent"></p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
 
 </form>
 
@@ -365,19 +459,129 @@ $colspan = 16;
 
 <script>
     function fmemberlist_submit(f) {
-        if (!is_checked("chk[]")) {
-            alert(document.pressed + " 하실 항목을 하나 이상 선택하세요.");
-            return false;
-        }
+        // if (!is_checked("chk[]")) {
+        //     alert(document.pressed + " 하실 항목을 하나 이상 선택하세요.");
+        //     return false;
+        // }
 
-        if (document.pressed == "선택삭제") {
-            if (!confirm("선택한 자료를 정말 삭제하시겠습니까?")) {
-                return false;
-            }
-        }
+        // if (document.pressed == "선택삭제") {
+        //     if (!confirm("선택한 자료를 정말 삭제하시겠습니까?")) {
+        //         return false;
+        //     }
+        // }
 
-        return true;
+        return false;
     }
+</script>
+
+<script>
+    const loremIpsum = document.getElementById("lorem-ipsum");
+
+    fetch("https://baconipsum.com/api/?type=all-meat&paras=200&format=html")
+        .then(response => response.text())
+        .then(result => loremIpsum.innerHTML = result)
+        const modal = document.getElementById("modal")
+    function modalOn() {
+        modal.style.display = "flex"
+    }
+    function isModalOn() {
+        return modal.style.display === "flex"
+    }
+    function modalOff() {
+        modal.style.display = "none"
+    }
+
+    var btnModal = document.querySelectorAll(".btn-modal");
+
+    btnModal.forEach(
+        function(currentValue, currentIndex, listObj) {
+            currentValue.addEventListener("click", e => {
+                const curBtn = (currentValue.id).split('_');
+                const curBtnText = curBtn[0];
+                const curBtnUser = curBtn[1];
+                console.log(curBtnUser);
+                
+                var hello = '';
+                let query = '';
+
+                if (curBtnText === 'delete') {
+
+                    
+
+                    // $.post('member_list_select_user.php', {'mb_id' : curBtnUser}, function(data){
+                    //     var jsonData = JSON.parse(data); // turn the data string into JSON
+
+                    //     console.log(jsonData);
+                    //     var newHtml = ""; // Initialize the var outside of the .each function
+                    //     console.log(newHtml);
+                    //     $.each(jsonData, function(item) {
+                    //         newHtml += item;
+                    //     })
+                    //     hello = newHtml;
+                    // });
+
+                    console.log(hello);
+                    
+                    alert('삭제 모달 띄워야함');
+                    return;
+                }
+
+                const user_name = document.querySelector(".modal_user_name");
+                const user_auth = document.querySelector(".modal_user_auth");
+                const user_id = document.querySelector(".modal_user_id");
+                const user_email = document.querySelector(".modal_user_email");
+                const user_tel = document.querySelector(".modal_user_tel");
+                const user_hp = document.querySelector(".modal_user_hp");
+                const user_addr = document.querySelector(".modal_user_addr");
+                const user_news = document.querySelector(".modal_user_news");
+                const user_recent = document.querySelector(".modal_user_recent");
+                
+                $.ajax({
+                    method: 'POST',
+                    url: "./member_list_select_user.php",
+                    data: { mb_id: curBtnUser },
+                    success: function(data) {
+                        const obj = JSON.parse(data);
+
+                        user_name.innerHTML = obj['mb_name'];
+                        user_auth.innerHTML = obj['mb_level'];
+                        user_id.innerHTML = obj['mb_id'];
+                        user_email.innerHTML = obj['mb_email'];
+                        user_tel.innerHTML = obj['mb_tel'];
+                        user_hp.innerHTML = obj['mb_hp'];
+                        user_addr.innerHTML = obj['mb_addr1'] + obj['mb_addr2'] + obj['mb_addr3'];
+                    }
+                })
+
+                if (curBtnText === 'select') {
+                    document.querySelector(".modal_title").innerHTML = '회원정보 확인';
+                    alert('확인입니당');
+                } else {
+                    document.querySelector(".modal_title").innerHTML = '회원정보 수정';
+                    alert('수정입니당');
+                }
+                modalOn();
+            });
+        }
+    );
+    // btnModal.addEventListener("click", e => {
+    //     modalOn()
+    // })
+    const closeBtn = modal.querySelector(".close-area")
+    closeBtn.addEventListener("click", e => {
+        modalOff()
+    })
+    modal.addEventListener("click", e => {
+        const evTarget = e.target
+        if(evTarget.classList.contains("modal-overlay")) {
+            modalOff()
+        }
+    })
+    window.addEventListener("keyup", e => {
+        if(isModalOn() && e.key === "Escape") {
+            modalOff()
+        }
+    })
 </script>
 
 <?php

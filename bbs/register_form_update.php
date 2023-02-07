@@ -17,9 +17,9 @@ if ($w == 'u' && $is_admin == 'super') {
         alert('데모 화면에서는 하실(보실) 수 없는 작업입니다.');
 }
 
-if (run_replace('register_member_chk_captcha', !chk_captcha(), $w)) {
-    alert('자동등록방지 숫자가 틀렸습니다.');
-}
+// if (run_replace('register_member_chk_captcha', !chk_captcha(), $w)) {
+//     alert('자동등록방지 숫자ddddd가 틀렸습니다.');
+// }
 
 if($w == 'u')
     $mb_id = isset($_SESSION['ss_mb_id']) ? trim($_SESSION['ss_mb_id']) : '';
@@ -89,10 +89,10 @@ if ($w == '' || $w == 'u') {
     if($tmp_mb_name != $mb_name) {
         alert('이름을 올바르게 입력해 주십시오.');
     }
-    $tmp_mb_nick = iconv('UTF-8', 'UTF-8//IGNORE', $mb_nick);
-    if($tmp_mb_nick != $mb_nick) {
-        alert('닉네임을 올바르게 입력해 주십시오.');
-    }
+    // $tmp_mb_nick = iconv('UTF-8', 'UTF-8//IGNORE', $mb_nick);
+    // if($tmp_mb_nick != $mb_nick) {
+    //     alert('닉네임을 올바르게 입력해 주십시오.');
+    // }
 
     // 비밀번호를 체크하는 상태의 기본값은 true이며, 비밀번호를 체크하지 않으려면 hook 을 통해 false 값으로 바꿔야 합니다.
     $is_check_password = run_replace('register_member_password_check', true, $mb_id, $mb_nick, $mb_email, $w);
@@ -105,13 +105,13 @@ if ($w == '' || $w == 'u') {
     }
 
     if ($msg = empty_mb_name($mb_name))       alert($msg, "", true, true);
-    if ($msg = empty_mb_nick($mb_nick))     alert($msg, "", true, true);
+    // if ($msg = empty_mb_nick($mb_nick))     alert($msg, "", true, true);
     if ($msg = empty_mb_email($mb_email))   alert($msg, "", true, true);
     if ($msg = reserve_mb_id($mb_id))       alert($msg, "", true, true);
-    if ($msg = reserve_mb_nick($mb_nick))   alert($msg, "", true, true);
+    // if ($msg = reserve_mb_nick($mb_nick))   alert($msg, "", true, true);
     // 이름에 한글명 체크를 하지 않는다.
     //if ($msg = valid_mb_name($mb_name))     alert($msg, "", true, true);
-    if ($msg = valid_mb_nick($mb_nick))     alert($msg, "", true, true);
+    // if ($msg = valid_mb_nick($mb_nick))     alert($msg, "", true, true);
     if ($msg = valid_mb_email($mb_email))   alert($msg, "", true, true);
     if ($msg = prohibit_mb_email($mb_email))alert($msg, "", true, true);
 
@@ -157,7 +157,7 @@ if ($w == '' || $w == 'u') {
 
     run_event('register_form_update_valid', $w, $mb_id, $mb_nick, $mb_email);
 
-    if ($msg = exist_mb_nick($mb_nick, $mb_id))     alert($msg, "", true, true);
+    // if ($msg = exist_mb_nick($mb_nick, $mb_id))     alert($msg, "", true, true);
     if ($msg = exist_mb_email($mb_email, $mb_id))   alert($msg, "", true, true);
 }
 

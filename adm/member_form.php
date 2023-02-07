@@ -48,6 +48,8 @@ $required_mb_password = '';
 $html_title = '';
 
 if ($w == '') {
+
+    
     $required_mb_id = 'required';
     $required_mb_id_class = 'required alnum_';
     $required_mb_password = 'required';
@@ -56,8 +58,13 @@ if ($w == '') {
     $mb['mb_mailling'] = 1;
     $mb['mb_open'] = 1;
     $mb['mb_level'] = $config['cf_register_level'];
-    $html_title = '추가';
 } elseif ($w == 'u') {
+    $mb['mb_level'] = $member['mb_level'];
+    // $_POST['mb_level'] = $member['mb_level'];
+    echo '<script>';
+    echo 'console.log("'.$mb['mb_level'].'")';
+    echo '</script>';
+    $html_title = '추가';
 // if (true) {
     // $mb = get_member($mb_id);
     $mb = get_member($member['mb_id']);
@@ -78,8 +85,8 @@ if ($w == '') {
     $mb['mb_email'] = get_text($mb['mb_email']);
     $mb['mb_homepage'] = ''; // = get_text($mb['mb_homepage']);
     $mb['mb_birth'] = get_text($mb['mb_birth']);
-    $mb['mb_tel'] = '21212'; // get_text($mb['mb_tel']);
-    $mb['mb_hp'] = '22222'; // get_text($mb['mb_hp']);
+    $mb['mb_tel'] = get_text($mb['mb_tel']); // get_text($mb['mb_tel']);
+    $mb['mb_hp'] = get_text($mb['mb_hp']); // get_text($mb['mb_hp']);
     $mb['mb_addr1'] = get_text($mb['mb_addr1']);
     $mb['mb_addr2'] = get_text($mb['mb_addr2']);
     $mb['mb_addr3'] = get_text($mb['mb_addr3']);

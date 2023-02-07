@@ -74,7 +74,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/style.css">', 
     function fregister_submit(f)
     {
         if (!f.agree.checked) {
-            alert("회원가입약관의 내용에 동의하셔야 회원가입 하실 수 있습니다.");
+            alert("회원가입약관의 내용에 동의하셔ㄴㄴㄴㄴㄴㄴ야 회원가입 하실 수 있습니다.");
             f.agree.focus();
             return false;
         }

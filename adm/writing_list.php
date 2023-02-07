@@ -12,11 +12,6 @@ $writingStatusArray = ['대기', '승인', '거절'];
  * 1. DB에서 g5_write가 붙은 테이블들 조회해서 배열로 만듦
  * 2. 해당 테이블들 전부 join + select query 진행
  * 3. 전부 나온 쿼리들 datetime 순으로 sort 하기 + 번호 붙이기
- * 
- * 
- * 
- * 
- * 
  */
 $sql = "SELECT bo_table AS table_name FROM (SELECT @ROWNUM:=@ROWNUM+1 AS ROWNUM, b.* FROM g5_board b, (SELECT @ROWNUM:=0) TMP) A LEFT JOIN g5_group G ON A.gr_id = G.gr_id WHERE gr_1 NOT IN (3, 4);";
 
@@ -149,7 +144,9 @@ $colspan = 16;
 
 
 <!-- onsubmit="return fmemberlist_submit(this);" -->
-<form name="fmemberlist" id="fmemberlist" action="./member_list_update.php"  method="post">
+<!-- action="./writing_list_update.php"  -->
+<!-- method="post" -->
+<form name="fmemberlist" id="fmemberlist" onsubmit="return fmemberlist_submit(this);" action="./writing_list_update.php"  method="post">
     <input type="hidden" name="sst" value="<?php echo $sst ?>">
     <input type="hidden" name="sod" value="<?php echo $sod ?>">
     <input type="hidden" name="sfl" value="<?php echo $sfl ?>">
@@ -403,7 +400,6 @@ $colspan = 16;
         <?php if ($is_admin == 'super') { ?>
             <a href="./member_form.php" id="member_add" class="btn btn_01">회원추가</a>
         <?php } ?>
-
     </div>
 
     <div id="container">
@@ -414,14 +410,21 @@ $colspan = 16;
     <div id="modal" class="modal-overlay">
         <div class="modal-window">
             <div class="title">
-                <h2>모달</h2>
+                <h2>회원정보 확인</h2>
             </div>
             <div class="close-area">X</div>
             <div class="content">
-                <p>가나다라마바사 아자차카타파하</p>
-                <p>가나다라마바사 아자차카타파하</p>
-                <p>가나다라마바사 아자차카타파하</p>
-                <p>가나다라마바사 아자차카타파하</p>
+                <table>
+                    <th>테이블 헤더 만드는 태그</th>
+                    <tr>
+                        <td>
+                            <p>안녕하세요</p>
+                        </td>
+                        <td>
+                            <p>안녕하세요22</p>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
@@ -431,22 +434,22 @@ $colspan = 16;
 
 <?php echo get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf_write_pages'], $page, $total_page, '?' . $qstr . '&amp;page='); ?>
 
-<!-- <script>
+<script>
     function fmemberlist_submit(f) {
         // if (!is_checked("chk[]")) {
         //     alert(document.pressed + " 하실 항목을 하나 이상 선택하세요.");
         //     return false;
         // }
 
-        // if (document.pressed == "선택삭제") {
-        //     if (!confirm("선택한 자료를 정말 삭제하시겠습니까?")) {
-        //         return false;
-        //     }
-        // }
+        if (document.pressed == "선택삭제") {
+            if (!confirm("선택한 자료를 정말 삭제하시겠습니까?")) {
+                return false;
+            }
+        }
 
-        return true;
+        return false;
     } 
-</script>-->
+</script>
 
 <script>
     const loremIpsum = document.getElementById("lorem-ipsum");

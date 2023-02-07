@@ -14,7 +14,7 @@ $count = (isset($_POST['chk']) && is_array($_POST['chk'])) ? count($_POST['chk']
 $post_act_button = isset($_POST['act_button']) ? clean_xss_tags($_POST['act_button'], 1, 1) : '';
 
 if (!$count) {
-    alert($_POST['act_button'] . " 하실 항목을 하나 이상 체크하세요.");
+    alert($_POST['act_button'] . " 하실 항목을11 하나 이상 체크하세요.");
 }
 
 if ((isset($_POST['mb_id']) && !is_array($_POST['mb_id'])) || (isset($_POST['au_menu']) && !is_array($_POST['au_menu']))) {

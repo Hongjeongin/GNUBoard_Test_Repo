@@ -70,13 +70,8 @@ $check_keys = array(
     'mb_mailling',
     'mb_sms',
     'mb_open',
-    'mb_profile',
-    'mb_level'
+    'mb_profile'
 );
-
-for ($i = 1; $i <= 10; $i++) {
-    $check_keys[] = 'mb_' . $i;
-}
 
 foreach ($check_keys as $key) {
     if( in_array($key, array('mb_signature', 'mb_profile')) ){
@@ -110,7 +105,7 @@ $sql_common = "  mb_name = '{$posts['mb_name']}',
                  mb_sms = '{$posts['mb_sms']}',
                  mb_open = '{$posts['mb_open']}',
                  mb_profile = '{$posts['mb_profile']}',
-                 mb_level = '{$posts['mb_level']}',
+                 mb_level = '{$member['mb_level']}',
                  mb_1 = '{$posts['mb_1']}',
                  mb_2 = '{$posts['mb_2']}',
                  mb_3 = '{$posts['mb_3']}',
@@ -122,15 +117,12 @@ $sql_common = "  mb_name = '{$posts['mb_name']}',
                  mb_9 = '{$posts['mb_9']}',
                  mb_10 = '{$posts['mb_10']}' ";
 
-echo '<script>';
-echo 'console.log("isMobile : ");';
-echo '</script>';
-
 // try {
 //     throw new Exception('asdfadsfsda');
 // } catch(Exception $e) {
 //     return;
 // }
+// alert($posts['mb_level']);
 
 if ($w == '') {
     $mb = get_member($mb_id);
@@ -211,8 +203,6 @@ if ($w == '') {
                      {$sql_certify}
                 where mb_id = '{$mb_id}' ";
     sql_query($sql);
-
-    alert('안녕');
 } else {
     alert('제대로 된 값이 넘어오지 않았습니다.');
 }

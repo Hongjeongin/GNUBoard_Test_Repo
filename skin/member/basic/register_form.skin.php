@@ -7,7 +7,7 @@ add_javascript('<script src="'.G5_JS_URL.'/jquery.register_form.js"></script>', 
 if ($config['cf_cert_use'] && ($config['cf_cert_simple'] || $config['cf_cert_ipin'] || $config['cf_cert_hp']))
     add_javascript('<script src="'.G5_JS_URL.'/certify.js?v='.G5_JS_VER.'"></script>', 0);
 ?>
-
+<script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
 <!-- 회원정보 입력/수정 시작 { -->
 
 <div class="register">
@@ -26,7 +26,6 @@ if ($config['cf_cert_use'] && ($config['cf_cert_simple'] || $config['cf_cert_ipi
 	
 	<div id="register_form" class="form_01">   
 	    <div class="register_form_inner">
-	        <h2>사이트 이용정보 입력</h2>
 	        <ul>
 	            <li>
 	                <label for="reg_mb_id">
@@ -45,11 +44,56 @@ if ($config['cf_cert_use'] && ($config['cf_cert_simple'] || $config['cf_cert_ipi
 	                <label for="reg_mb_password_re">비밀번호 확인 (필수)</label>
 	                <input type="password" name="mb_password_re" id="reg_mb_password_re" <?php echo $required ?> class="frm_input full_input <?php echo $required ?>" minlength="3" maxlength="20" placeholder="비밀번호 확인">
 	            </li>
+				<li>
+	                <label for="reg_mb_name">이름 (필수)<?php echo $desc_name ?></label>
+	                <input type="text" id="reg_mb_name" name="mb_name" value="<?php echo get_text($member['mb_name']) ?>" <?php echo $required ?> <?php echo $name_readonly; ?> class="frm_input full_input <?php echo $required ?> <?php echo $name_readonly ?>" size="10" placeholder="이름">
+	            </li>
+				<li>
+	                <label for="reg_mb_email">E-mail (필수)
+	                
+	                <?php if ($config['cf_use_email_certify']) {  ?>
+	                <button type="button" class="tooltip_icon"><i class="fa fa-question-circle-o" aria-hidden="true"></i><span class="sound_only">설명보기</span></button>
+					<span class="tooltip">
+	                    <?php if ($w=='') { echo "E-mail 로 발송된 내용을 확인한 후 인증하셔야 회원가입이 완료됩니다."; }  ?>
+	                    <?php if ($w=='u') { echo "E-mail 주소를 변경하시면 다시 인증하셔야 합니다."; }  ?>
+	                </span>
+	                <?php }  ?>
+					</label>
+
+	                <input type="hidden" name="old_email" value="<?php echo $member['mb_email'] ?>">
+	                <input type="text" name="mb_email" value="<?php echo isset($member['mb_email'])?$member['mb_email']:''; ?>" id="reg_mb_email" required class="frm_input email full_input required" size="70" maxlength="100" placeholder="E-mail">
+	            </li>
+				<li>
+	                <label for="reg_mb_tel">전화번호</label>
+	                <input type="text" name="mb_tel" value="<?php echo get_text($member['mb_tel']) ?>" id="reg_mb_tel" <?php echo $config['cf_req_tel']?"required":""; ?> class="frm_input full_input <?php echo $config['cf_req_tel']?"required":""; ?>" maxlength="20" placeholder="전화번호">
+				</li>
+				<li>
+	                <label for="reg_mb_hp">휴대폰번호<?php if (!empty($hp_required)) { ?> (필수)<?php } ?><?php echo $desc_phone ?></label>
+	                
+	                <input type="text" name="mb_hp" value="<?php echo get_text($member['mb_hp']) ?>" id="reg_mb_hp" <?php echo $hp_required; ?> <?php echo $hp_readonly; ?> class="frm_input full_input <?php echo $hp_required; ?> <?php echo $hp_readonly; ?>" maxlength="20" placeholder="휴대폰번호">
+	                <?php if ($config['cf_cert_use'] && ($config['cf_cert_hp'] || $config['cf_cert_simple'])) { ?>
+	                <input type="hidden" name="old_mb_hp" value="<?php echo get_text($member['mb_hp']) ?>">
+	                <?php } ?>
+	            </li>
+				<li>
+	            	<label>주소</label>
+					<?php if ($config['cf_req_addr']) { ?> (필수)<?php }  ?>
+	                <label for="reg_mb_zip" class="sound_only">우편번호<?php echo $config['cf_req_addr']?' (필수)':''; ?></label>
+	                <input type="text" name="mb_zip" value="<?php echo $member['mb_zip1'].$member['mb_zip2']; ?>" id="reg_mb_zip" <?php echo $config['cf_req_addr']?"required":""; ?> class="frm_input twopart_input <?php echo $config['cf_req_addr']?"required":""; ?>" size="5" maxlength="6"  placeholder="우편번호">
+	                <button type="button" class="btn_frmline" onclick="win_zip('fregisterform', 'mb_zip', 'mb_addr1', 'mb_addr2', 'mb_addr3', 'mb_addr_jibeon');">주소 검색</button><br>
+	                <input type="text" name="mb_addr1" value="<?php echo get_text($member['mb_addr1']) ?>" id="reg_mb_addr1" <?php echo $config['cf_req_addr']?"required":""; ?> class="frm_input frm_address full_input <?php echo $config['cf_req_addr']?"required":""; ?>" size="50"  placeholder="기본주소">
+	                <label for="reg_mb_addr1" class="sound_only">기본주소<?php echo $config['cf_req_addr']?' (필수)':''; ?></label><br>
+	                <input type="text" name="mb_addr2" value="<?php echo get_text($member['mb_addr2']) ?>" id="reg_mb_addr2" class="frm_input frm_address full_input" size="50" placeholder="상세주소">
+	                <label for="reg_mb_addr2" class="sound_only">상세주소</label>
+	                <br>
+	                <input type="text" name="mb_addr3" value="<?php echo get_text($member['mb_addr3']) ?>" id="reg_mb_addr3" class="frm_input frm_address full_input" size="50" readonly="readonly" placeholder="참고항목">
+	                <label for="reg_mb_addr3" class="sound_only">참고항목</label>
+	                <input type="hidden" name="mb_addr_jibeon" value="<?php echo get_text($member['mb_addr_jibeon']); ?>">
+	            </li>
 	        </ul>
 	    </div>
 	
 	    <div class="tbl_frm01 tbl_wrap register_form_inner">
-	        <h2>개인정보 입력</h2>
 	        <ul>
 				<li>
                     <?php 
@@ -94,10 +138,10 @@ if ($config['cf_cert_use'] && ($config['cf_cert_simple'] || $config['cf_cert_ipi
 	                </div>
 				<?php } ?>
 				</li>
-	            <li>
+	            <!-- <li>
 	                <label for="reg_mb_name">이름 (필수)<?php echo $desc_name ?></label>
 	                <input type="text" id="reg_mb_name" name="mb_name" value="<?php echo get_text($member['mb_name']) ?>" <?php echo $required ?> <?php echo $name_readonly; ?> class="frm_input full_input <?php echo $required ?> <?php echo $name_readonly ?>" size="10" placeholder="이름">
-	            </li>
+	            </li> -->
 	            <!-- <?php if ($req_nick) {  ?>
 	             <li>
 	                <label for="reg_mb_nick">
@@ -112,7 +156,7 @@ if ($config['cf_cert_use'] && ($config['cf_cert_simple'] || $config['cf_cert_ipi
 	            </li>
 	            <?php }  ?> -->
 	
-	            <li>
+	            <!-- <li>
 	                <label for="reg_mb_email">E-mail (필수)
 	                
 	                <?php if ($config['cf_use_email_certify']) {  ?>
@@ -126,34 +170,36 @@ if ($config['cf_cert_use'] && ($config['cf_cert_simple'] || $config['cf_cert_ipi
 
 	                <input type="hidden" name="old_email" value="<?php echo $member['mb_email'] ?>">
 	                <input type="text" name="mb_email" value="<?php echo isset($member['mb_email'])?$member['mb_email']:''; ?>" id="reg_mb_email" required class="frm_input email full_input required" size="70" maxlength="100" placeholder="E-mail">
-	            </li>
+	            </li> -->
 	
-	            <?php if ($config['cf_use_homepage']) {  ?>
+				<li>
+	            <!-- <?php if ($config['cf_use_tel']) {  ?> -->
+	            <!-- <?php if ($config['cf_req_tel']) { ?> (필수)<?php } ?> -->
+	                <label for="reg_mb_tel">전화번호</label>
+	                <input type="text" name="mb_tel" value="<?php echo get_text($member['mb_tel']) ?>" id="reg_mb_tel" <?php echo $config['cf_req_tel']?"required":""; ?> class="frm_input full_input <?php echo $config['cf_req_tel']?"required":""; ?>" maxlength="20" placeholder="전화번호">
+	            <!-- <?php }  ?> -->
+				</li>
+
+	            <!-- <?php if ($config['cf_use_homepage']) {  ?>
 	            <li>
 	                <label for="reg_mb_homepage">홈페이지<?php if ($config['cf_req_homepage']){ ?> (필수)<?php } ?></label>
 	                <input type="text" name="mb_homepage" value="<?php echo get_text($member['mb_homepage']) ?>" id="reg_mb_homepage" <?php echo $config['cf_req_homepage']?"required":""; ?> class="frm_input full_input <?php echo $config['cf_req_homepage']?"required":""; ?>" size="70" maxlength="255" placeholder="홈페이지">
 	            </li>
-	            <?php }  ?>
+	            <?php }  ?> -->
 	
-	            <li>
-	            <?php if ($config['cf_use_tel']) {  ?>
 	            
-	                <label for="reg_mb_tel">전화번호<?php if ($config['cf_req_tel']) { ?> (필수)<?php } ?></label>
-	                <input type="text" name="mb_tel" value="<?php echo get_text($member['mb_tel']) ?>" id="reg_mb_tel" <?php echo $config['cf_req_tel']?"required":""; ?> class="frm_input full_input <?php echo $config['cf_req_tel']?"required":""; ?>" maxlength="20" placeholder="전화번호">
-	            <?php }  ?>
-				</li>
 				<li>
-	            <?php if ($config['cf_use_hp'] || ($config["cf_cert_use"] && ($config['cf_cert_hp'] || $config['cf_cert_simple']))) {  ?>
+	            <!-- <?php if ($config['cf_use_hp'] || ($config["cf_cert_use"] && ($config['cf_cert_hp'] || $config['cf_cert_simple']))) {  ?> -->
 	                <label for="reg_mb_hp">휴대폰번호<?php if (!empty($hp_required)) { ?> (필수)<?php } ?><?php echo $desc_phone ?></label>
 	                
 	                <input type="text" name="mb_hp" value="<?php echo get_text($member['mb_hp']) ?>" id="reg_mb_hp" <?php echo $hp_required; ?> <?php echo $hp_readonly; ?> class="frm_input full_input <?php echo $hp_required; ?> <?php echo $hp_readonly; ?>" maxlength="20" placeholder="휴대폰번호">
 	                <?php if ($config['cf_cert_use'] && ($config['cf_cert_hp'] || $config['cf_cert_simple'])) { ?>
 	                <input type="hidden" name="old_mb_hp" value="<?php echo get_text($member['mb_hp']) ?>">
 	                <?php } ?>
-	            <?php }  ?>
+	            <!-- <?php }  ?> -->
 	            </li>
 	
-	            <?php if ($config['cf_use_addr']) { ?>
+	            <!-- <?php if ($config['cf_use_addr']) { ?> -->
 	            <li>
 	            	<label>주소</label>
 					<?php if ($config['cf_req_addr']) { ?> (필수)<?php }  ?>
@@ -169,11 +215,11 @@ if ($config['cf_cert_use'] && ($config['cf_cert_simple'] || $config['cf_cert_ipi
 	                <label for="reg_mb_addr3" class="sound_only">참고항목</label>
 	                <input type="hidden" name="mb_addr_jibeon" value="<?php echo get_text($member['mb_addr_jibeon']); ?>">
 	            </li>
-	            <?php }  ?>
+	            <!-- <?php }  ?> -->
 	        </ul>
 	    </div>
 	
-	    <div class="tbl_frm01 tbl_wrap register_form_inner">
+	    <!-- <div class="tbl_frm01 tbl_wrap register_form_inner">
 	        <h2>기타 개인설정</h2>
 	        <ul>
 	            <?php if ($config['cf_use_signature']) {  ?>
@@ -293,7 +339,7 @@ gif, jpg, png파일만 가능하며 용량 <?php echo number_format($config['cf_
 	                자동등록방지
 	            </li>
 	        </ul>
-	    </div>
+	    </div> -->
 	</div>
 	<div class="btn_confirm">
 	    <a href="<?php echo G5_URL ?>" class="btn_close">취소</a>
@@ -498,7 +544,6 @@ function fregisterform_submit(f)
     //  echo chk_captcha_js();  
 
 	console.log('asdfasdfasdf');
-	return false;
 
     document.getElementById("btn_submit").disabled = "disabled";
 
