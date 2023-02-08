@@ -34,9 +34,7 @@ if ($stx) {
     $sql_search .= " ) ";
 }
 
-if ($is_admin != 'super') {
-    $sql_search .= " and mb_level <= '{$member['mb_level']}' ";
-}
+$sql_search .= " and mb_level <= '{$member['mb_level']}' and mb_leave_date != '1'";
 
 if (!$sst) {
     $sst = "mb_datetime";
@@ -108,7 +106,7 @@ $colspan = 16;
 
 <div class="local_desc01 local_desc">
     <p>
-        회원자료 삭제 시 다른 회원이 기존 회원아이디를 사용하지 못하도록 회원아이디, 이름, 닉네임은 삭제하지 않고 영구 보관합니다.
+        회원자료 삭제 시 다른 회원이 기존 회원아이디를 사용하지 못하도록 회원아이디, 이름은 삭제하지 않고 영구 보관합니다.
     </p>
 </div>
 
@@ -167,21 +165,16 @@ $colspan = 16;
                         $group = '<a href="./boardgroupmember_form.php?mb_id=' . $row['mb_id'] . '">' . $row2['cnt'] . '</a>';
                     }
 
-                    echo '<script>';
-                    echo 'console.log("hello'.$group.'")';
-                    echo '</script>';
-
                     if ($row['mb_level'] > 8) {
-                        $s_inf = '<a href="" class="btn btn_01">확인</a>';
                         $s_inf = '<button id="select_'.$row['mb_id'].'" class="btn btn_01 btn-modal">확인</button>';
                         
                         $s_mod = '';
                         $s_grp = '';
                     } else {
                         $s_inf = '';
-                        $s_mod = '<a href="./member_form.php?' . $qstr . '&amp;w=u&amp;mb_id=' . $row['mb_id'] . '" class="btn btn_03">수정</a>';
+                        // $s_mod = '<a href="./member_form.php?' . $qstr . '&amp;w=u&amp;mb_id=' . $row['mb_id'] . '" class="btn btn_03">수정</a>';
                         $s_mod = '<button id="modify_'.$row['mb_id'].'" class="btn btn_03 btn-modal">수정</button>';
-                        $s_grp = '<a href="./boardgroupmember_form.php?mb_id=' . $row['mb_id'] . '" class="btn btn_02">삭제</a>';
+                        // $s_grp = '<a href="./boardgroupmember_form.php?mb_id=' . $row['mb_id'] . '" class="btn btn_02">삭제</a>';
                         $s_grp = '<button id="delete_'.$row['mb_id'].'" class="btn btn_02 btn-modal">삭제</button>';
                     }
 
@@ -358,14 +351,14 @@ $colspan = 16;
         </table>
     </div>
 
-    <div class="btn_fixed_top">
+    <!-- <div class="btn_fixed_top">
         <input type="submit" name="act_button" value="선택수정" onclick="document.pressed=this.value" class="btn btn_02">
         <input type="submit" name="act_button" value="선택삭제" onclick="document.pressed=this.value" class="btn btn_02">
         <?php if ($is_admin == 'super') { ?>
             <a href="./member_form.php" id="member_add" class="btn btn_01">회원추가</a>
         <?php } ?>
 
-    </div>
+    </div> -->
 
     <!-- <div id="container">
         <button id="btn-modal">확인</button>
@@ -391,8 +384,13 @@ $colspan = 16;
                         <td>
                             <p>권한</p>
                         </td>
-                        <td>
+                        <td class="auth_field">
                             <p class="modal_user_auth"></p>
+                            <select name="auth_selectBox" id="auth_selectBox">
+                                <option value="2">일반회원</option>
+                                <option value="8">기자</option>
+                                <option value="9">미디어 관리자</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
@@ -448,6 +446,28 @@ $colspan = 16;
                         </td>
                     </tr>
                 </table>
+                <div class="middle_fix">
+                    <!-- <button class="">닫기</button> -->
+                    <!-- <a href="./member_form.php?' . $qstr . '&amp;w=u&amp;mb_id=' . $row['mb_id'] . '" class="btn btn_03 submit_btn">수정</a> -->
+                    <a href="javascript:modify();" class="btn btn_03 submit_btn">수정</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modal_" class="modal-overlay_">
+        <div class="modal-window">
+            <div class="title">
+                <h2 class="delete_modal_title">회원정보 삭제</h2>
+            </div>
+            <div class="close-area_">X</div>
+            <div class="content">
+                <div>
+                    <h2>삭제하시겠습니까?<h2>
+                </div>
+
+                <div class="middle_fix">
+                    <a href="javascript:delete_();" class="btn btn_03 submit_btn_">삭제</a>
+                </div>
             </div>
         </div>
     </div>
@@ -472,15 +492,50 @@ $colspan = 16;
 
         return false;
     }
+    
 </script>
 
 <script>
     const loremIpsum = document.getElementById("lorem-ipsum");
+    const authList = ['', '', '일반회원', '','','','','', '기자', '미디어 관리자', '최고관리자'];
+    let level = 0;
+    let selectedLevel = 0;
+    let id = '';
 
     fetch("https://baconipsum.com/api/?type=all-meat&paras=200&format=html")
         .then(response => response.text())
         .then(result => loremIpsum.innerHTML = result)
-        const modal = document.getElementById("modal")
+        const modal = document.getElementById("modal");
+        const modal_ = document.getElementById("modal_");
+
+    function modal_On() {
+        modal_.style.display = "flex"
+    }
+    function isModal_On() {
+        return modal_.style.display === "flex"
+    }
+
+    function modal_Off() {
+        modal_.style.display = "none"
+    }
+
+    const closeBtn_ = modal_.querySelector(".close-area_")
+    closeBtn_.addEventListener("click", e => {
+        modal_Off()
+    })
+    modal_.addEventListener("click", e => {
+        const evTarget = e.target
+        if(evTarget.classList.contains("modal-overlay_")) {
+            modal_Off()
+        }
+    })
+    window.addEventListener("keyup", e => {
+        if(isModal_On() && e.key === "Escape") {
+            modal_Off()
+        }
+    })
+
+
     function modalOn() {
         modal.style.display = "flex"
     }
@@ -490,39 +545,57 @@ $colspan = 16;
     function modalOff() {
         modal.style.display = "none"
     }
+    async function modify() {
+        const btn = document.querySelector(".submit_btn");
+        if (btn.innerHTML == '수정') {
+            selectedLevel = $("select[name=auth_selectBox] option:selected").val();
+            await $.ajax({
+                method: 'POST',
+                url: "./member_list_update_user.php",
+                data: { mb_level: selectedLevel, mb_id: id },
+                success: function(data) {
+                    console.log(data);
+                    if (!data) {
+                        alert('DB 오류입니다.');
+                    }
+                }
+            })
+            window.location.reload();
+        }
+        modalOff();
+    }
+    async function delete_() {
+        console.log('123');
+        console.log(id);
+        await $.ajax({
+            method: 'POST',
+            url: "./member_list_update_user.php",
+            data: { mb_id: id },
+            success: function(data) {
+                console.log(data);
+                if (!data) {
+                    alert('DB 오류입니다.');
+                }
+            }
+        })
+        console.log('123123');
+        modal_Off();
+    }
 
     var btnModal = document.querySelectorAll(".btn-modal");
 
     btnModal.forEach(
         function(currentValue, currentIndex, listObj) {
-            currentValue.addEventListener("click", e => {
+            currentValue.addEventListener("click", async e => {
                 const curBtn = (currentValue.id).split('_');
+                console.log(curBtn);
                 const curBtnText = curBtn[0];
                 const curBtnUser = curBtn[1];
-                console.log(curBtnUser);
-                
-                var hello = '';
-                let query = '';
+
+                id = curBtnUser;
 
                 if (curBtnText === 'delete') {
-
-                    
-
-                    // $.post('member_list_select_user.php', {'mb_id' : curBtnUser}, function(data){
-                    //     var jsonData = JSON.parse(data); // turn the data string into JSON
-
-                    //     console.log(jsonData);
-                    //     var newHtml = ""; // Initialize the var outside of the .each function
-                    //     console.log(newHtml);
-                    //     $.each(jsonData, function(item) {
-                    //         newHtml += item;
-                    //     })
-                    //     hello = newHtml;
-                    // });
-
-                    console.log(hello);
-                    
-                    alert('삭제 모달 띄워야함');
+                    modal_On();
                     return;
                 }
 
@@ -535,8 +608,11 @@ $colspan = 16;
                 const user_addr = document.querySelector(".modal_user_addr");
                 const user_news = document.querySelector(".modal_user_news");
                 const user_recent = document.querySelector(".modal_user_recent");
-                
-                $.ajax({
+                const submit_btn = document.querySelector(".submit_btn");
+                const select_box = document.querySelector("#auth_selectBox");
+                const modal_title = document.querySelector(".modal_title");
+
+                await $.ajax({
                     method: 'POST',
                     url: "./member_list_select_user.php",
                     data: { mb_id: curBtnUser },
@@ -544,29 +620,36 @@ $colspan = 16;
                         const obj = JSON.parse(data);
 
                         user_name.innerHTML = obj['mb_name'];
-                        user_auth.innerHTML = obj['mb_level'];
                         user_id.innerHTML = obj['mb_id'];
                         user_email.innerHTML = obj['mb_email'];
                         user_tel.innerHTML = obj['mb_tel'];
                         user_hp.innerHTML = obj['mb_hp'];
-                        user_addr.innerHTML = obj['mb_addr1'] + obj['mb_addr2'] + obj['mb_addr3'];
+                        user_addr.innerHTML = obj['mb_addr1'] + '<br>' + obj['mb_addr2'] + ' ' + obj['mb_addr3'];
+                        user_auth.innerHTML = obj['mb_level'];
+                        level = obj['mb_level'];
                     }
                 })
 
                 if (curBtnText === 'select') {
-                    document.querySelector(".modal_title").innerHTML = '회원정보 확인';
-                    alert('확인입니당');
-                } else {
-                    document.querySelector(".modal_title").innerHTML = '회원정보 수정';
-                    alert('수정입니당');
+                    modal_title.innerHTML = '회원정보 확인';
+                    submit_btn.innerHTML = '닫기';
+                    user_auth.innerHTML = authList[level];
+                    select_box.style.display = 'none';
+                    user_auth.style.display = 'block';
+                    
+
+                } else if (curBtnText === 'modify'){
+                    modal_title.innerHTML = '회원정보 수정';
+                    submit_btn.innerHTML = '수정';
+                    select_box.style.display = 'block';
+                    user_auth.style.display = 'none';
+                    await $('#auth_selectBox').val(`${level}`).prop('selected', true);
                 }
                 modalOn();
             });
         }
     );
-    // btnModal.addEventListener("click", e => {
-    //     modalOn()
-    // })
+
     const closeBtn = modal.querySelector(".close-area")
     closeBtn.addEventListener("click", e => {
         modalOff()
