@@ -80,28 +80,13 @@ require_once './admin.head.php';
 
 <div class="btn_fixed_top">
   <?php if ($is_admin == 'super') { ?>
-    <a href="./disclosure_form.php" id="wr_add" class="btn btn_03">공시 등록</a>
+    <a href="./disclosure_create.php" id="wr_add" class="btn btn_03">공시 등록</a>
   <?php } ?>
 </div>
 
 <?php echo get_paging(G5_IS_MOBILE ? $config['cf_mobile_pages'] : $config['cf_write_pages'], $page, $total_page, '?' . $qstr . '&amp;page='); ?>
 
 <script>
-  function fmemberlist_submit(f) {
-    if (!is_checked("chk[]")) {
-      alert(document.pressed + " 하실 항목을 하나 이상 선택하세요.");
-      return false;
-    }
-
-    if (document.pressed == "선택삭제") {
-      if (!confirm("선택한 자료를 정말 삭제하시겠습니까?")) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   async function delete_disclosure(id) {
     console.log(id);
     if (confirm('해당 공시를 삭제하시겠습니까?')) {
