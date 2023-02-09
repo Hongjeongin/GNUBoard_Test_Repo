@@ -80,7 +80,7 @@ require_once './admin.head.php';
 
 <div class="btn_fixed_top">
   <?php if ($is_admin == 'super') { ?>
-    <a href="./disclosure_create.php" id="wr_add" class="btn btn_03">공시 등록</a>
+    <a href="./disclosure_form.php" id="wr_add" class="btn btn_03">공시 등록</a>
   <?php } ?>
 </div>
 
