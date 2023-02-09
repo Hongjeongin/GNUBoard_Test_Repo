@@ -97,7 +97,7 @@ if (!empty($_COOKIE['g5_admin_btn_gnb'])) {
 
         var el_id = document.getElementById(id);
 
-        //submenu = eval(name+".style");
+        submenu = eval(name+".style");
         submenu = el_id.style;
         submenu.left = tempX - (w + 11);
         submenu.top = tempY - (h / 2);
@@ -114,7 +114,7 @@ if (!empty($_COOKIE['g5_admin_btn_gnb'])) {
 <header id="hd">
     <h1><?php echo $config['cf_title'] ?></h1>
     <div id="hd_top">
-        <!-- <button type="button" id="btn_gnb" class="btn_gnb_close button<?php echo $adm_menu_cookie['btn_gnb']; ?>">메뉴</button> -->
+        <button type="button" id="btn_gnb" class="btn_gnb_close button<?php echo $adm_menu_cookie['btn_gnb']; ?>">메뉴</button>
         <div id="logo"><a href="<?php echo correct_goto_url(G5_ADMIN_URL . '/member_form.php', 'member'); ?>"><img src="<?php echo G5_ADMIN_URL ?>/img/logo.png" alt="<?php echo get_text($config['cf_title']); ?> 관리자"></a></div>
 
         <div id="tnb">
@@ -156,7 +156,7 @@ if (!empty($_COOKIE['g5_admin_btn_gnb'])) {
                 $button_title = $menu['menu' . $key][0][1];
             ?>
                 <li class="gnb_li<?php echo $current_class; ?>">
-                    <!-- <button type="button" class="btn_op menu-<?php echo $key; ?> menu-order-<?php echo $jj; ?>" title="<?php echo $button_title; ?>"><?php echo $button_title; ?></button> -->
+                    <button type="button" class="btn_op menu-<?php echo $key; ?> menu-order-<?php echo $jj; ?>" title="<?php echo $button_title; ?>"><?php echo $button_title; ?></button>
                     <div class="gnb_oparea_wr">
                         <div class="gnb_oparea">
                             <h3><?php echo $menu['menu' . $key][0][1]; ?></h3>
@@ -175,33 +175,33 @@ if (!empty($_COOKIE['g5_admin_btn_gnb'])) {
 <script>
     jQuery(function($) {
 
-        // var menu_cookie_key = 'g5_admin_btn_gnb';
+        var menu_cookie_key = 'g5_admin_btn_gnb';
 
-        // $(".tnb_mb_btn").click(function() {
-        //     $(".tnb_mb_area").toggle();
-        // });
+        $(".tnb_mb_btn").click(function() {
+            $(".tnb_mb_area").toggle();
+        });
 
-        // $("#btn_gnb").click(function() {
+        $("#btn_gnb").click(function() {
 
-        //     var $this = $(this);
+            var $this = $(this);
 
-        //     try {
-        //         if (!$this.hasClass("btn_gnb_open")) {
-        //             set_cookie(menu_cookie_key, 1, 60 * 60 * 24 * 365);
-        //         } else {
-        //             delete_cookie(menu_cookie_key);
-        //         }
-        //     } catch (err) {}
+            try {
+                if (!$this.hasClass("btn_gnb_open")) {
+                    set_cookie(menu_cookie_key, 1, 60 * 60 * 24 * 365);
+                } else {
+                    delete_cookie(menu_cookie_key);
+                }
+            } catch (err) {}
 
-        //     $("#container").toggleClass("container-small");
-        //     $("#gnb").toggleClass("gnb_small");
-        //     $this.toggleClass("btn_gnb_open");
+            $("#container").toggleClass("container-small");
+            $("#gnb").toggleClass("gnb_small");
+            $this.toggleClass("btn_gnb_open");
 
-        // });
+        });
 
-        // $(".gnb_ul li .btn_op").click(function() {
-        //     $(this).parent().addClass("on").siblings().removeClass("on");
-        // });
+        $(".gnb_ul li .btn_op").click(function() {
+            $(this).parent().addClass("on").siblings().removeClass("on");
+        });
 
     });
 </script>

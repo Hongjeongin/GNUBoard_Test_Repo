@@ -34,6 +34,12 @@ if ($stx) {
     $sql_search .= " ) ";
 }
 
+// $num = 0;
+
+// if ($_COOKIE['memberListPageIndex']) {
+//     $num = $_COOKIE['memberListPageIndex'];
+// }
+
 $sql_search .= " and mb_level <= '{$member['mb_level']}' and mb_leave_date != '1'";
 
 if (!$sst) {
@@ -69,10 +75,12 @@ $listall = '<a href="' . $_SERVER['SCRIPT_NAME'] . '" class="ov_listall">전체�
 $g5['title'] = '회원 리스트';
 require_once './admin.head.php';
 
-$sql = " select * {$sql_common} {$sql_search} {$sql_order} limit {$from_record}, {$rows} ";
+$sql = " select * {$sql_common}  {$sql_search} {$sql_order} limit {$from_record}, {$rows}";
+
 $result = sql_query($sql);
 
 $colspan = 16;
+
 ?>
 
 <div class="local_ov01 local_ov">
@@ -155,7 +163,9 @@ $colspan = 16;
             </thead>
             <tbody>
                 <?php
+                
                 for ($i = 0; $row = sql_fetch_array($result); $i++) {
+                    $num += 1;
                     // 접근가능한 그룹수
                     $sql2 = " select count(*) as cnt from {$g5['group_member_table']} where mb_id = '{$row['mb_id']}' ";
                     $row2 = sql_fetch($sql2);
@@ -297,7 +307,7 @@ $colspan = 16;
                         <!-- <td headers="mb_list_mng" rowspan="2" class="td_mng td_mng_s"><?php echo $s_mod ?><?php echo $s_grp ?></td> 
                     </tr>-->
                     <tr class="<?php echo $bg; ?>">
-                        <td headers="mb_list_name"><?php echo get_text($row['mb_no']);?></td>
+                        <td headers="mb_list_name"><?php echo $i + 1;?></td>
                         <!-- <td headers="mb_list_nick" class="td_mbname"><?php echo get_text($row['mb_name']); ?></td> -->
                         <td headers="mb_list_nick"><?php echo get_text($row['mb_name']); ?></td>
                         <!-- <td headers="mb_list_cert" class="td_name sv_use">
@@ -343,6 +353,7 @@ $colspan = 16;
 
                 <?php
                 }
+                setcookie('memberListPageIndex', "{$num}");
                 if ($i == 0) {
                     echo "<tr><td colspan=\"" . $colspan . "\" class=\"empty_table\">자료가 없습니다.</td></tr>";
                 }
@@ -531,10 +542,12 @@ $colspan = 16;
     })
     window.addEventListener("keyup", e => {
         if(isModal_On() && e.key === "Escape") {
-            modal_Off()
+            modal_Off();
+        }
+        if(isModalOn() && e.key === "Escape") {
+            modalOff();
         }
     })
-
 
     function modalOn() {
         modal.style.display = "flex"
@@ -660,11 +673,7 @@ $colspan = 16;
             modalOff()
         }
     })
-    window.addEventListener("keyup", e => {
-        if(isModalOn() && e.key === "Escape") {
-            modalOff()
-        }
-    })
+    
 </script>
 
 <?php

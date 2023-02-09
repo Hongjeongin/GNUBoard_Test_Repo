@@ -12,4 +12,3 @@ $menu['menu200'] = array(
     array('200900', '업무 요청', G5_ADMIN_URL . '/work_request.php', 'mb_poll'),
     array('200550', '섹션 관리', G5_ADMIN_URL . '/boardgroup_list.php', 'mb_board')
 );
-
