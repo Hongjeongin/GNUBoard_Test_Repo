@@ -65,7 +65,7 @@ require_once './admin.head.php';
             <td headers="mb_list_nick"><?php echo get_text($row['wr_subject']); ?></td>
             <td headers="mb_list_cert"><?php echo get_text($row['wr_name']); ?></td>
             <td headers="mb_list_mailc"><?php echo get_text($row['wr_datetime']) ?></td>
-            <td headers="mb_list_mailr"><?php echo get_text($row['wr_datetime']) ?></td>
+            <td headers="mb_list_mailr"><?php echo get_text($row['wr_last']) ?></td>
             <td headers="mb_list_mng" colspan="2" class="td_mng td_mng_s">
               <a href="" class="btn btn_02">확인</a>
               <a href="javascript:delete_disclosure('<?php echo $row['wr_id'] ?>')" class="btn btn_01">삭제</a>
@@ -80,7 +80,7 @@ require_once './admin.head.php';
 
 <div class="btn_fixed_top">
   <?php if ($is_admin == 'super') { ?>
-    <a href="./disclosure_create.php" id="wr_add" class="btn btn_03">공시 등록</a>
+    <a href="./disclosure_create.php" id="wr_add" class="btn btn_03">공시 작성</a>
   <?php } ?>
 </div>
 

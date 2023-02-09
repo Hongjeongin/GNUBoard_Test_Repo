@@ -2,7 +2,7 @@
 $sub_menu = "200100";
 require_once './_common.php';
 
-$g5['title'] = '공시 등록';
+$g5['title'] = '공시 작성';
 require_once './admin.head.php';
 
 if ($_POST['submit']) {
@@ -51,44 +51,61 @@ if ($_POST['submit']) {
   $wr['wr_subject'] = $_POST['wr_subject'];
   $wr['wr_content'] = $_POST['wr_content'];
   $wr['wr_name'] = $_POST['wr_name'];
-  $wr['wr_datetime'] = $_POST['wr_datetime'];
+  $wr['wr_datetime'] = date('Y-m-d H:i:s');
+  $wr['wr_last'] = $_POST['wr_datetime'];
 
-  $wr_sql = "insert into g5_write_notice set ";
-  foreach ($wr as $key => $value) {
+  $wr_sql = "INSERT INTO g5_write_notice SET ";
+  foreach ($wr as $key => $value)
     $wr_sql .= $key . " = '" . $value . "', ";
-  }
   $wr_sql = substr($wr_sql, 0, -2);
 
   $wr_result = sql_query($wr_sql);
 
-  if ($_FILES['file']['name'][0] != '') {
-    $file = array(
-      'name_origin' => [],
-      'name_save' => [],
-      'created_at' => [],
-    );
+  $count = array();
+  for ($i = 0; $i < count($_FILES['upload_file']['name']); $i++)
+    if ($_FILES['upload_file']['name'][$i] != '')
+      $count[] = $i;
 
-    for ($i = 0; $i < count($_FILES['file']['name']); $i++) {
-      $file['name_origin'][$i] = $_FILES['file']['name'][$i];
-      $file['name_save'][$i] = $_FILES['file']['name'][$i];
-      $file['created_at'][$i] = date('Y-m-d H:i:s');
+  if (count($count) > 0) {
+    $upload_file_result = true;
+
+    $wr_id_sql = "SELECT wr_id FROM g5_write_notice ORDER BY wr_id DESC LIMIT 1";
+    $wr_id_result = sql_fetch($wr_id_sql);
+    $wr_id = $wr_id_result['wr_id'];
+
+    foreach ($count as $i) {
+      $upload_file = array(
+        'up_name_origin' => '',
+        'up_name_save' => '',
+        'up_path' => '',
+        'up_created_at' => '',
+        'wr_id' => 0,
+      );
+
+      $ext = substr(strrchr($_FILES['upload_file']['name'][$i], '.'), 1);
+      $code_name = md5(uniqid(rand(), true));
+
+      $upload_file['up_name_origin'] = $_FILES['upload_file']['name'][$i];
+      $upload_file['up_name_save'] = $code_name;
+      $upload_file['up_path'] = G5_DATA_PATH . '/upload_file/' . $code_name . '.' . $ext;
+      $upload_file['up_created_at'] = date('Y-m-d H:i:s');
+      $upload_file['wr_id'] = $wr_id;
+
+      $upload_file_sql = "INSERT INTO g5_upload_file SET ";
+      foreach ($upload_file as $key => $value)
+        $upload_file_sql .= $key . " = '" . $value . "', ";
+      $upload_file_sql = substr($upload_file_sql, 0, -2);
+
+      move_uploaded_file($_FILES['upload_file']['tmp_name'][$i], $upload_file['up_path']);
+
+      $upload_file_result &= sql_query($upload_file_sql);
     }
-
-    $file_sql = "insert into g5_upload_file set ";
-    for ($i = 0; $i < count($file['name_origin']); $i++) {
-      $file_sql .= "name_origin = '" . $file['name_origin'][$i] . "', ";
-      $file_sql .= "name_save = '" . $file['name_save'][$i] . "', ";
-      $file_sql .= "created_at = '" . $file['created_at'][$i] . "', ";
-      $file_sql = substr($file_sql, 0, -2);
-    }
-
-    $file_result = sql_query($file_sql);
   }
 
-  if ($wr_result && ($file_result || $_FILES['file']['name'][0] == '')) {
+  if ($wr_result && ($upload_file_result || count($count) == 0)) {
     alert('등록되었습니다.', './disclosure.php');
   } else {
-    alert('등록에 실패했습니다.', './disclosure.php');
+    alert('등록에 실패했습니다.');
   }
 }
 ?>
@@ -118,13 +135,37 @@ if ($_POST['submit']) {
         <tr>
           <th scope="row">내용<strong class="sound_only">필수</strong></label></th>
           <td>
-            <textarea name="wr_content" required class="required frm_input" cols="70" rows="10"></textarea>
+            <textarea name="wr_content" required class="required frm_input" style="width: 100%; height: 300px;"></textarea>
           </td>
         </tr>
         <tr>
-          <th scope="row">첨부파일</label></th>
+          <th scope="row">첨부파일1</th>
           <td>
-            <input type="file" name="file[]" title="파일첨부 1 : 용량 <?php echo $upload_max_filesize ?> 이하만 업로드 가능">
+            <input type="file" name="upload_file[]" id="upload_file">
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">첨부파일2</th>
+          <td>
+            <input type="file" name="upload_file[]" id="upload_file">
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">첨부파일3</th>
+          <td>
+            <input type="file" name="upload_file[]" id="upload_file">
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">첨부파일4</th>
+          <td>
+            <input type="file" name="upload_file[]" id="upload_file">
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">첨부파일5</th>
+          <td>
+            <input type="file" name="upload_file[]" id="upload_file">
           </td>
         </tr>
       </tbody>
