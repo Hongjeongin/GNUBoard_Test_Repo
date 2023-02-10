@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "200100";
+$sub_menu = "200200";
 require_once './_common.php';
 
 $g5['title'] = '공시 작성';

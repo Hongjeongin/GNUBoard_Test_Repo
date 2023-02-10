@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "200100";
+$sub_menu = "200200";
 require_once './_common.php';
 
 auth_check_menu($auth, $sub_menu, 'r');
@@ -26,7 +26,7 @@ $g5['title'] = '공시 리스트';
 require_once './admin.head.php';
 ?>
 
-<form id="fsearch" name="fsearch" class="local_sch01 local_sch" method="get">
+<form class="local_sch01 local_sch" method="get">
   <select name="sfl" id="sfl">
     <option value="wr_subject" <?php echo get_selected($sfl, 'wr_subject'); ?>>제목</option>
     <option value="wr_content" <?php echo get_selected($sfl, 'wr_content'); ?>>내용</option>
