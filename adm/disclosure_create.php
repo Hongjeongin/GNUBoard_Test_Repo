@@ -62,7 +62,7 @@ if ($_POST['submit']) {
   $wr_result = sql_query($wr_sql);
 
   $count = array();
-  for ($i = 0; $i < count($_FILES['upload_file']['name']); $i++)
+  for ($i = 1; $i < count($_FILES['upload_file']['name']); $i++)
     if ($_FILES['upload_file']['name'][$i] != '')
       $count[] = $i;
 
@@ -96,7 +96,7 @@ if ($_POST['submit']) {
         $upload_file_sql .= $key . " = '" . $value . "', ";
       $upload_file_sql = substr($upload_file_sql, 0, -2);
 
-      move_uploaded_file($_FILES['upload_file']['tmp_name'][$i], $upload_file['up_path']);
+      // move_uploaded_file($_FILES['upload_file']['tmp_name'][$i], $upload_file['up_path']);
 
       $upload_file_result &= sql_query($upload_file_sql);
     }
@@ -111,40 +111,50 @@ if ($_POST['submit']) {
 ?>
 
 <form action="" method="post" enctype="multipart/form-data">
-  <div class="tbl_frm01 tbl_wrap">
-    <table>
-      <tbody>
-        <tr>
-          <th scope="row">공시 제목<strong class="sound_only">필수</strong></label></th>
-          <td>
-            <input type="text" name="wr_subject" required class="required frm_input" size="70" maxlength="1000">
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">작성자<strong class="sound_only">필수</strong></label></th>
-          <td>
-            <input type="text" name="wr_name" required class="required frm_input" size="70" maxlength="1000">
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">등록 날짜<strong class="sound_only">필수</strong></label></th>
-          <td>
-            <input type="date" name="wr_datetime" required="" class="frm_input required hasDatepicker">
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">내용<strong class="sound_only">필수</strong></label></th>
-          <td>
-            <textarea name="wr_content" required class="required frm_input" style="width: 100%; height: 300px;"></textarea>
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">첨부파일
-            <button type="button" class="btn btn-primary btn-sm" onclick="add_file()" style="margin-left: 10px;">추가</button>
+  <div class="article_container" style="width: 100%; height: 100%; display: flex;">
+    <div class="tbl_frm01 tbl_wrap" style="width: 70%; border-right: 1px solid #ddd;">
+      <table>
+        <tbody>
+          <tr>
+            <th scope="row">공시 제목<strong class="sound_only">필수</strong></label></th>
+            <td>
+              <input type="text" name="wr_subject" required class="required frm_input" size="70" maxlength="1000" placeholder="공시 제목을 입력하세요">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">작성자<strong class="sound_only">필수</strong></label></th>
+            <td>
+              <input type="text" name="wr_name" required class="required frm_input" size="70" maxlength="1000" placeholder="작성자를 입력하세요">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">등록 날짜<strong class="sound_only">필수</strong></label></th>
+            <td>
+              <input type="date" name="wr_datetime" required="" class="frm_input required hasDatepicker">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">내용<strong class="sound_only">필수</strong></label></th>
+            <td>
+              <textarea name="wr_content" required class="required frm_input" style="width: 100%; height: 300px;"></textarea>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="file_container" style="width: 30%;">
+      <table class="tbl_frm01 tbl_wrap">
+        <thead>
+          <th scope="row" style="width: 100%;">
+            <label for="upload_file" style=" text-align: center; margin: 0 auto;">파일 업로드</label>
+            <button type="button" class="btn btn_03" onclick="add_file()" style="float: right;">추가</button>
+            <input type="file" name="upload_file[]" onchange="file_change(this)" style="display: none;">
           </th>
-        </tr>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div class="middle_fix">
     <input type="submit" name="submit" value="등록 하기" class="btn_submit btn">
@@ -153,36 +163,48 @@ if ($_POST['submit']) {
 
 <script>
   function add_file() {
-    let html = '<tr>';
-    html += '<th scope="row">첨부파일</th>';
-    html += '<td>';
-    html += '<input type="file" name="upload_file[]" id="upload_file" accept=".png, .jpg, .jpeg, .gif" onchange="file_change(this)">';
-    html += '<img src="" alt="" style="width: 100px; height: 100px; margin: 10px; display: none;">';
-    html += '<button type="button" class="btn btn-danger btn-sm" onclick="delete_file(this)" style="margin: 10px;">삭제</button>';
-    html += '</td>';
-
-    if ($('input[name="upload_file[]"]').length >= 5) {
-      alert('파일은 5개까지만 업로드할 수 있습니다.');
+    if ($('.file_container tbody tr').length >= 5) {
+      alert('파일은 5개까지만 첨부 가능합니다.');
       return;
     }
 
-    $('tr:last').after(html);
+    $('.file_container thead input').click();
   }
 
   function file_change(obj) {
-    let file = obj.files[0];
-    let reader = new FileReader();
+    if (obj.files.length == 0)
+      return;
+
+    const clone = obj.cloneNode(true);
+    clone.files = obj.files;
+    console.log(clone.files[0]);
+
+    const html = `
+    <tr>
+      <td>
+        <img src="" alt="" style="width: 100px; height: 100px;">
+        <div style="float: right; line-height: 100px;">
+          <button type="button" class="btn btn_01" onclick="delete_file(this)">X</button>
+        </div>
+      </td>
+    </tr>
+  `;
+
+    $('.file_container tbody').append(html);
+    $('.file_container tbody tr:last-child').append(clone);
+
+    const file = obj.files[0];
+    const reader = new FileReader();
 
     reader.onload = function(e) {
-      $(obj).next().attr('src', e.target.result);
-      $(obj).next().show();
+      $('.file_container tbody tr:last-child img').attr('src', e.target.result);
     }
 
     reader.readAsDataURL(file);
   }
 
   function delete_file(obj) {
-    $(obj).parent().parent().remove();
+    $(obj).parent().parent().parent().remove();
   }
 </script>
 
