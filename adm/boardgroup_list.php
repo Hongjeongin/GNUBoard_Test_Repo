@@ -13,6 +13,163 @@ require_once './_common.php';
 //     sql_query(" ALTER TABLE  `{$g5['group_table']}` ADD  `gr_device` ENUM(  'both',  'pc',  'mobile' ) NOT NULL DEFAULT  'both' AFTER  `gr_subject` ", false);
 // }
 
+if ($is_admin != 'super') {
+    alert('최고관리자만 접근 가능합니다.');
+}
+
+// 메뉴테이블 생성
+if (!isset($g5['menu_table'])) {
+    die('<meta charset="utf-8">dbconfig.php 파일에 <strong>$g5[\'menu_table\'] = G5_TABLE_PREFIX.\'menu\';</strong> 를 추가해 주세요.');
+}
+
+if (!sql_query(" DESCRIBE {$g5['menu_table']} ", false)) {
+    sql_query(
+        " CREATE TABLE IF NOT EXISTS `{$g5['menu_table']}` (
+                  `me_id` int(11) NOT NULL AUTO_INCREMENT,
+                  `me_code` varchar(255) NOT NULL DEFAULT '',
+                  `me_name` varchar(255) NOT NULL DEFAULT '',
+                  `me_link` varchar(255) NOT NULL DEFAULT '',
+                  `me_target` varchar(255) NOT NULL DEFAULT '0',
+                  `me_order` int(11) NOT NULL DEFAULT '0',
+                  `me_use` tinyint(4) NOT NULL DEFAULT '0',
+                  `me_mobile_use` tinyint(4) NOT NULL DEFAULT '0',
+                  PRIMARY KEY (`me_id`)
+                ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ",
+        true
+    );
+}
+
+// $sql = " select * from (select * from {$g5['board_table']} A LEFT JOIN g5_group B ON A.me_name = B.gr_id) C LEFT JOIN g5_sections D ON C.gr_1 = D.se_no order by me_id ";
+
+$sql = " select * from {$g5['board_table']} A LEFT JOIN g5_sections B ON A.bo_1 = B.se_id order by bo_3";
+
+$result = sql_query($sql);
+
+// $g5['title'] = "메뉴설정";
+$g5['title'] = '섹션 설정';
+require_once './admin.head.php';
+
+$colspan = 7;
+$sub_menu_info = '';
+?>
+
+<div class="local_desc01 local_desc">
+    <p><strong>주의!</strong> 메뉴설정 작업 후 반드시 <strong>확인</strong>을 누르셔야 저장됩니다.</p>
+</div>
+
+<form name="fmenulist" id="fmenulist" method="post" action="./menu_list_update.php" onsubmit="return fmenulist_submit(this);">
+    <input type="hidden" name="token" value="">
+    <div id="menulist" class="tbl_head01 tbl_wrap">
+        <table>
+            <caption><?php echo $g5['title']; ?> 목록</caption>
+            <thead>
+                <tr>
+                    <th scope="col">순서</th>
+                    <th scope="col">관리</th>
+                    <th scope="col">섹션타입</th>
+                    <th scope="col">섹션명</th>
+                    <th scope="col">링크</th>
+                    <!-- <th scope="col">새창</th> -->
+                    <!-- <th scope="col">PC사용</th>
+                    <th scope="col">모바일사용</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                for ($i = 0; $row = sql_fetch_array($result); $i++) {
+                    $bg = 'bg' . ($i % 2);
+                    $sub_menu_class = '';
+                    if (strlen($row['me_code']) == 4) {
+                        $sub_menu_class = ' sub_menu_class';
+                        $sub_menu_info = '<span class="sound_only">' . $row['me_name'] . '의 서브</span>';
+                        $sub_menu_ico = '<span class="sub_menu_ico"></span>';
+                    }
+
+                    // $s_mov = '<button id="move_'.$row['gr_id'].'" class="btn btn_01">이동</button>';
+                    $s_upd = "<button id='modify_".($row['se_no'])."' class='btn btn_03 btn-modal'>수정</button>";
+                    $s_del = "<button id='delete_".($row['se_no'])."' class='btn btn_02 btn-modal'>삭제</button>";
+
+                    $search  = array('"', "'");
+                    $replace = array('&#034;', '&#039;');
+                    $me_name = str_replace($search, $replace, $row['me_name']);
+                ?>
+                    <tr class="<?php echo $bg; ?> menu_list menu_group_<?php echo substr($row['me_code'], 0, 2); ?>">
+                        <td class="td_num">
+                            <label for="me_order_<?php echo $i; ?>" class="sound_only">순서</label>
+                            <input type="text" name="me_order[]" value="<?php echo $row['bo_3']; ?>" id="me_order_<?php echo $row['se_no']; ?>" class="tbl_input" size="5">
+                        </td>
+                        <td class="td_mng">
+                            <!-- <?php echo $s_mov ?> -->
+                            <?php echo $s_upd ?><?php echo $s_del ?>
+                        </td>
+                        <!-- <td> -->
+                            <!-- <label for="me_order_<?php echo $i; ?>" class="sound_only">순서</label> -->
+                            <!-- <input type="text" name="me_table[]" value="<?php echo $row['bo_table'] ?>" id="me_table_<?php echo $i; ?>" class="required tbl_input full_input" size="5"> -->
+                            <!-- <?php echo $row['bo_table']; ?>
+                        </td> -->
+                            <!-- <?php if (strlen($row['me_code']) == 2) { ?>
+                                <button type="button" class="btn_add_submenu btn_03 ">추가</button>
+                                <?php } ?>
+                                <button type="button" class="btn_del_menu btn_02">삭제</button>
+                            </td> -->
+                        <td class="se_id_<?php echo ($i + 1) ?>">
+                            <?php echo $row['se_id'] ?>
+                        </td>
+                        <td id="td_category_<?php echo $row['se_no']; ?>" class="td_category">
+                            <!-- <input type="hidden" name="code[]" value="<?php echo substr($row['me_code'], 0, 2) ?>">
+                            <label for="me_name_<?php echo $i; ?>" class="sound_only"><?php echo $sub_menu_info; ?> 메뉴<strong class="sound_only"> 필수</strong></label>
+                            <input type="text" name="me_name[]" value="<?php echo get_sanitize_input($me_name); ?>" id="me_name_<?php echo $i; ?>" required class="required tbl_input full_input">-->
+                            <?php echo $row['bo_table'] ?>
+                        </td>
+                        <td>
+                            <?php echo $row['bo_2']?>
+                            <!-- <label for="me_link_<?php echo $i; ?>" class="sound_only">링크<strong class="sound_only"> 필수</strong></label>
+                            <input type="text" name="me_link[]" value="<?php echo $row['me_link'] ?>" id="me_link_<?php echo $i; ?>" required class="required tbl_input full_input"> -->
+                        </td>
+                        
+                        <!-- <td class="td_mng">
+                            <label for="me_target_<?php echo $i; ?>" class="sound_only">새창</label>
+                            <select name="me_target[]" id="me_target_<?php echo $i; ?>">
+                                <option value="self" <?php echo get_selected($row['me_target'], 'self', true); ?>>사용안함</option>
+                                <option value="blank" <?php echo get_selected($row['me_target'], 'blank', true); ?>>사용함</option>
+                            </select>
+                        </td>
+                        <td class="td_mng">
+                            <label for="me_use_<?php echo $i; ?>" class="sound_only">PC사용</label>
+                            <select name="me_use[]" id="me_use_<?php echo $i; ?>">
+                                <option value="1" <?php echo get_selected($row['me_use'], '1', true); ?>>사용함</option>
+                                <option value="0" <?php echo get_selected($row['me_use'], '0', true); ?>>사용안함</option>
+                            </select>
+                        </td>
+                        <td class="td_mng">
+                            <label for="me_mobile_use_<?php echo $i; ?>" class="sound_only">모바일사용</label>
+                            <select name="me_mobile_use[]" id="me_mobile_use_<?php echo $i; ?>">
+                                <option value="1" <?php echo get_selected($row['me_mobile_use'], '1', true); ?>>사용함</option>
+                                <option value="0" <?php echo get_selected($row['me_mobile_use'], '0', true); ?>>사용안함</option>
+                            </select>
+                        </td> -->
+                    </tr>
+                <?php
+                }
+
+                if ($i == 0) {
+                    echo '<tr id="empty_menu_list"><td colspan="' . $colspan . '" class="empty_table">자료가 없습니다.</td></tr>';
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="btn_fixed_top">
+        <button type="button" onclick="return add_menu();" class="btn btn_02">메뉴추가<span class="sound_only"> 새창</span></button>
+        <input id="finish_1" type="submit" name="act_button" value="확인" class="btn_submit btn btn-modal">
+        <button id="create_" class="btn btn_01 btn-modal">섹션 추가하기</button>
+    </div>
+
+</form>
+
+<!--                      ////////////////////////////////////////////                      -->
+<?php
 $sql_common = " from {$g5['group_table']} ";
 
 $sql_section_type = "select * from g5_group";
@@ -68,8 +225,7 @@ $result = sql_query($sql);
 
 // $listall = '<a href="' . $_SERVER['SCRIPT_NAME'] . '" class="ov_listall">처음</a>';
 
-$g5['title'] = '섹션 설정';
-require_once './admin.head.php';
+
 
 $selectBoxSql = "select * from g5_sections";
 
@@ -95,109 +251,14 @@ $colspan = 10;
     <input type="submit" value="검색" class="btn_submit">
 </form> -->
 
-<form name="fboardgrouplist" id="fboardgrouplist" action="./boardgroup_list_update.php" onsubmit="return fboardgrouplist_submit(this);" method="post">
-    <input type="hidden" name="sst" value="<?php echo $sst ?>">
-    <input type="hidden" name="sod" value="<?php echo $sod ?>">
-    <input type="hidden" name="sfl" value="<?php echo $sfl ?>">
-    <input type="hidden" name="stx" value="<?php echo $stx ?>">
-    <input type="hidden" name="page" value="<?php echo $page ?>">
-    <input type="hidden" name="token" value="">
 
-    <div class="tbl_head01 tbl_wrap">
-        <table id="sortable">
-            <caption><?php echo $g5['title']; ?> 목록</caption>
-            <thead>
-                <tr>
-                    <!-- <th scope="col">
-                        <label for="chkall" class="sound_only">그룹 전체</label>
-                        <input type="checkbox" name="chkall" value="1" id="chkall" onclick="check_all(this.form)">
-                    </th> -->
-                    <th scope="col">게시순서</th>
-                    <th scope="col">섹션타입</th>
-                    <th scope="col">섹션명</th>
-                    <th scope="col">관리</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                for ($i = 0; $row = sql_fetch_array($result); $i++) {
-                    // 접근회원수
-                    $sql1 = " select count(*) as cnt from {$g5['group_member_table']} where gr_id = '{$row['gr_id']}' ";
-                    $row1 = sql_fetch($sql1);
 
-                    // 게시판수
-                    $sql2 = " select count(*) as cnt from {$g5['board_table']} where gr_id = '{$row['gr_id']}' ";
-                    $row2 = sql_fetch($sql2);
-                    
-                    $s_mov = '<button id="move_'.$row['gr_id'].'" class="btn btn_01">이동</button>';
-                    $s_upd = '<button id="modify_'.$row['gr_id'].'" class="btn btn_03 btn-modal">수정</button>';
-                    $s_del = '<button id="delete_'.$row['gr_id'].'" class="btn btn_02 btn-modal">삭제</button>';
-                    // $s_upd = '<a href="./boardgroup_form.php?' . $qstr . '&amp;w=u&amp;gr_id=' . $row['gr_id'] . '" class="btn_03 btn">수정</a>';
-
-                    $bg = 'bg' . ($i % 2);
-                ?>
-
-                    <tr class="<?php echo $bg; ?>">
-                        <!-- <td class="td_chk">
-                            <input type="hidden" name="group_id[<?php echo $i ?>]" value="<?php echo $row['gr_id'] ?>">
-                            <label for="chk_<?php echo $i; ?>" class="sound_only"><?php echo get_text($row['gr_subject']); ?> 그룹</label>
-                            <input type="checkbox" name="chk[]" value="<?php echo $i ?>" id="chk_<?php echo $i ?>">
-                        </td> -->
-                        <td><?php echo $row['ROWNUM'] ?></td>
-                        <!-- 섹션타입 for문 필요 -->
-                        
-                        <td>
-                            <?php echo $row['se_id'] ?>
-                            <!-- <select name="sfl" id="sfl">
-                                <?php foreach($section_types as $value) { ?>
-                                    <option><?=$value?></option>
-                                <?php }?>
-                            </select> -->
-                        </td>
-                        <td><?php echo $row['gr_id'] ?></td>
-                        <!-- <td class="td_num"><a href="./board_list.php?sfl=a.gr_id&amp;stx=<?php echo $row['gr_id'] ?>"><?php echo $row2['cnt'] ?></a></td>
-                        <td class="td_numsmall">
-                            <label for="gr_use_access_<?php echo $i; ?>" class="sound_only">접근회원 사용</label>
-                            <input type="checkbox" name="gr_use_access[<?php echo $i ?>]" <?php echo $row['gr_use_access'] ? 'checked' : '' ?> value="1" id="gr_use_access_<?php echo $i ?>">
-                        </td>
-                        <td class="td_num"><a href="./boardgroupmember_list.php?gr_id=<?php echo $row['gr_id'] ?>"><?php echo $row1['cnt'] ?></a></td>
-                        <td class="td_numsmall">
-                            <label for="gr_order_<?php echo $i; ?>" class="sound_only">메인메뉴 출력순서</label>
-                            <input type="text" name="gr_order[<?php echo $i ?>]" value="<?php echo $row['gr_order'] ?>" id="gr_order_<?php echo $i ?>" class="tbl_input" size="2">
-                        </td>
-                        <td class="td_mng">
-                            <label for="gr_device_<?php echo $i; ?>" class="sound_only">접속기기</label>
-                            <select name="gr_device[<?php echo $i ?>]" id="gr_device_<?php echo $i ?>">
-                                <option value="both" <?php echo get_selected($row['gr_device'], 'both'); ?>>모두</option>
-                                <option value="pc" <?php echo get_selected($row['gr_device'], 'pc'); ?>>PC</option>
-                                <option value="mobile" <?php echo get_selected($row['gr_device'], 'mobile'); ?>>모바일</option>
-                            </select>
-                        </td> -->
-                        <td><?php echo $s_mov ?><?php echo $s_upd ?><?php echo $s_del ?></td>
-                    </tr>
-                <?php
-                }
-                if ($i == 0) {
-                    echo '<tr><td colspan="' . $colspan . '" class="empty_table">자료가 없습니다.</td></tr>';
-                }
-                ?>
-        </table>
-    </div>
-
-    <div class="btn_fixed_top">
-        <!-- <input type="submit" name="act_button" onclick="document.pressed=this.value" value="선택수정" class="btn btn_02">
-        <input type="submit" name="act_button" onclick="document.pressed=this.value" value="선택삭제" class="btn btn_02"> -->
-        <!-- <a href="./boardgroup_form.php" id= class="btn btn_01 btn-modal">섹션 추가하기</a> -->
-        <button id="create_" class="btn btn_01 btn-modal">섹션 추가하기</button>
-    </div>
-</form>
-
-<div class="local_desc01 local_desc">
+<!-- <div class="local_desc01 local_desc">
     <p>
         접근사용 옵션을 설정하시면 관리자가 지정한 회원만 해당 그룹에 접근할 수 있습니다.<br>
         접근사용 옵션은 해당 그룹에 속한 모든 게시판에 적용됩니다.
     </p>
-</div>
+</div> -->
 
 <div id="modal" class="modal-overlay">
     <div class="modal-window">
@@ -207,11 +268,11 @@ $colspan = 10;
         <div class="close-area">X</div>
         <div class="content">
             <table>
-                <th></th>
-                <th></th>
+                <!-- <th></th>
+                <th></th> -->
                 <tr>
                     <td>
-                        <p>섹션 이름</p>
+                        <p>섹션명</p>
                     </td>
                     <td>
                         <input id="modal_user_name" class="modal_user_name">
@@ -220,7 +281,7 @@ $colspan = 10;
                 </tr>
                 <tr>
                     <td>
-                        <p>타입</p>
+                        <p>섹션타입</p>
                     </td>
                     <td class="auth_field">
                         <select name="auth_selectBox" id="auth_selectBox">
@@ -403,11 +464,18 @@ $(document).ready(function() {
 </script>
 
 <script>
+    var uppers = /^(?=.*?[A-Z])/;
+    var lowers = /^(?=.*?[a-z])/;
+
     let id = '';
     let btnIndex = 0;
     let curGroupId = '';
     var sections = [];
-    let original_gr_id = '';
+    var section_names = [];
+    var numbers = [];
+    let original_bo_table = '';
+    let bo_3 = '';
+
 
     const loremIpsum = document.getElementById("lorem-ipsum");
     fetch("https://baconipsum.com/api/?type=all-meat&paras=200&format=html")
@@ -489,14 +557,16 @@ $(document).ready(function() {
     }
 
     async function create_section() {
-        const se_name = document.getElementById('modal_user_name').value;
-        if (!se_name) {
-            alert('섹션 이름 정해주세요.');
+        const bo_table = document.getElementById('modal_user_name').value;
+        if (!bo_table) {
+            alert('섹션 이름을 정해주세요.');
             return;
         }
+        console.log('1');
         const under_sections = [];
         const table_length = document.getElementById('under_section_table').getElementsByTagName('tbody')[0].childElementCount;
         
+        console.log('2');
         for (let i = 0; i < table_length; i++) {
             const curVal = document.getElementById(`under_input_${i + 1}`).value;
             if (!curVal) {
@@ -507,13 +577,19 @@ $(document).ready(function() {
         }
         const se_id = $("select[name=auth_selectBox] option:selected").text();
 
+        const me_link = '';
+
+        // me_link += `/board.php?bo_table=${bo_table}`;
+        console.log('123');
+
         const result = await $.ajax({
             method: 'POST',
             url: "./boardgroup_list_create_group.php",
             data: {
-                se_name: se_name,
                 under_sections: under_sections,
                 se_id: se_id,
+                me_link: me_link,
+                bo_table: bo_table,
             },
             success: function(data) {
                 if (!data) {
@@ -528,10 +604,10 @@ $(document).ready(function() {
         return result;
     }
 
-    // 처리해야함
     async function update_section() {
-        const se_name = document.getElementById('modal_user_name').value;
-        if (!se_name) {
+        const bo_table = document.getElementById('modal_user_name').value;
+        console.log(bo_table);
+        if (!bo_table) {
             alert('섹션 이름 정해주세요.');
             return;
         }
@@ -546,19 +622,23 @@ $(document).ready(function() {
             }
             under_sections.push(curVal);
         }
+        
         const se_id = $("select[name=auth_selectBox] option:selected").text();
+        const bo_3 = document.getElementById(`me_order_${curGroupId}`).value;
+        const me_link = '';
 
         const result = await $.ajax({
             method: 'POST',
             url: "./boardgroup_list_update_group.php",
             data: { 
-                se_name: se_name,
+                bo_table: bo_table,
                 under_sections: under_sections,
                 se_id: se_id,
-                original_gr_id: curGroupId,
+                original_bo_table: original_bo_table,
+                bo_3: bo_3,
+                me_link: me_link,
             },
             success: function(data) {
-                console.log(data);
                 if (!data) {
                     alert('이미 존재하는 섹션입니다.');
                     return false;
@@ -566,21 +646,19 @@ $(document).ready(function() {
                 return data;
             }
         })
-        // window.location.reload();
+        window.location.reload();
         modalOff();
         return result;
     }
 
-
-    // 처리해야함
     async function delete_section() {
-        console.log(curGroupId);
+        const bo_table = document.getElementById('modal_user_name').value;
+        
         const result = await $.ajax({
             method: 'POST',
             url: "./boardgroup_list_update_group.php",
-            data: { gr_id: curGroupId },
+            data: { bo_table: bo_table },
             success: function(data) {
-                console.log(data);
                 if (!data) {
                     alert('DB 오류입니다.');
                     return false;
@@ -593,6 +671,28 @@ $(document).ready(function() {
         return result;
     }
 
+    async function finish() {
+        const bo_table = document.getElementById('modal_user_name').value;
+
+        const result = await $.ajax({
+            method: 'POST',
+            url: "./boardgroup_list_update_group.php",
+            data: { 
+                sections: section_names,
+                numbers: numbers
+            },
+            success: function(data) {
+                if (!data) {
+                    alert('DB 오류입니다.');
+                    return false;
+                }
+                return data;
+            }
+        });
+        window.location.reload();
+        return result;
+    }
+
     async function add_under_section(e) {
         btnIndex += 1;
         let newButton = "";
@@ -601,17 +701,15 @@ $(document).ready(function() {
         newButton += `<td width="40%">
                         <input id="under_input_${btnIndex}" class="under_input_${btnIndex}">
                     </td>`;
-        newButton += `<td width="30%">
-                        <a href="javascript:" onclick="move_under_section(this)" class="under_section_move_${btnIndex} btn btn_01">
-                            이동
-                        </a>`;
                         
-        newButton += `<a href="javascript:" onclick="delete_under_section(this)" class="under_section_delete_${btnIndex} btn btn_03">
-                            삭제
-                        </a>`;
-
-        newButton += `<a href="javascript:" onclick="add_under_section(this)" class="under_section_add_${btnIndex} btn btn_02">
+        newButton += `<td width="40%">
+                        <a href="javascript:" onclick="add_under_section(this)" class="under_section_add_${btnIndex} btn btn_03">
                             추가
+                        </a>
+                        `;
+
+        newButton += `<a href="javascript:" onclick="delete_under_section(this)" class="under_section_delete_${btnIndex} btn btn_02">
+                            삭제
                         </a>
                     </td>
                     </tr>`;
@@ -671,18 +769,16 @@ $(document).ready(function() {
             newButton += `<td width="40%">
                             <input id="under_input_${btnIndex}" class="under_input_${btnIndex}">
                         </td>`;
-            newButton += `<td width="30%">
-                            <a href="javascript:" onclick="move_under_section(this)" class="under_section_move_${btnIndex} btn btn_01">
-                                이동
-                        </a>`;
+        
 
-            newButton += `<a href="javascript:" onclick="delete_under_section(this)" class="under_section_delete_${btnIndex} btn btn_03">
-                                삭제
-                        </a>`;
-            
-            newButton += `<a href="javascript:" onclick="add_under_section(this)" class="under_section_add_${btnIndex} btn btn_02">
+            newButton += `<td width="30%">
+                            <a href="javascript:" onclick="add_under_section(this)" class="under_section_add_${btnIndex} btn btn_03">
                                 추가
-                            </a>
+                            </a>`;
+            
+            newButton += `<a href="javascript:" onclick="delete_under_section(this)" class="under_section_delete_${btnIndex} btn btn_02">
+                                삭제
+                        </a>
                         </td>
                         </tr>`;
             await realTable.append(newButton);
@@ -704,30 +800,49 @@ $(document).ready(function() {
                 const modal_title = document.querySelector(".modal_title");
 
                 $('.btn-modal').on('click', function() {
-                        var thisRow = $(this).closest('tr');
-                    });
+                    var thisRow = $(this).closest('tr');
+                });
+
+                
 
                 if (!curBtnGroup) {
                     modal_title.innerHTML = '섹션 추가';
                     submit_btn.innerHTML = '추가';
+                    $('#auth_selectBox').val('1').prop('selected', true);
+                    document.getElementById("auth_selectBox").removeAttribute("disabled");
                     await $('.submit_btn').prop('href', 'javascript:create_section();');
                     document.getElementById("modal_user_name").value = '';
                     modalOn();
                     return;
                 }
 
+                if (curBtnText === 'finish') {
+                    // section_names + numbers 만들기
+                    let order = document.querySelectorAll(".tbl_input");
+                    let section_ = document.querySelectorAll(".td_category");
+                    for (let i = 0; i < order.length; i++) {
+                        section_names.push(section_[i].innerText);
+                        numbers.push(order[i].value);
+                    }
+                    await finish();
+                    return;
+                }
+
+                
+
                 curGroupId = curBtnGroup;
 
-                id = (await select_section_type(curBtnGroup))['gr_1'];
-                if (!id) return;
+                // id = (await select_section_type(curBtnGroup))['gr_1'];
+                // if (!id) return;
+
+                const bo_name = document.getElementById(`td_category_${curBtnGroup}`).innerText;
+                original_bo_table = bo_name
+                document.getElementById("modal_user_name").value = bo_name;
 
                 if (curBtnText === 'delete') {
                     await $('.submit_btn_').prop('href', 'javascript:delete_section();');
                     modal_On();
                     return;
-                }
-                if (curBtnText === 'move') {
-
                 }
 
                 sections = [];
@@ -735,7 +850,7 @@ $(document).ready(function() {
                 await $.ajax({
                     method: 'POST',
                     url: "./boardgroup_list_select_type.php",
-                    data: { gr_id: curBtnGroup, no: 'no' },
+                    data: { se_no: curBtnGroup, no: 'no' },
                     success: function(data) {
                         const array_data = data.split('}');
                         
@@ -746,7 +861,7 @@ $(document).ready(function() {
                             }
                             array_data[i] += "}";
 
-                            sections.push((JSON.parse(array_data[i]))['bo_subject']);
+                            sections.push((JSON.parse(array_data[i]))['me_name']);
                         }
                     }
                 })
@@ -754,14 +869,20 @@ $(document).ready(function() {
                 if (curBtnText === 'modify') {
                     modal_title.innerHTML = '섹션 수정';
                     submit_btn.innerHTML = '수정';
-                    document.getElementById("modal_user_name").value = curBtnGroup;
+                    $('#auth_selectBox').val(`${curBtnGroup}`).prop('selected', true);
+
+                    // const bo_name = document.getElementById(`td_category_${curBtnGroup}`).innerText;
+                    // original_bo_table = bo_name
+                    // document.getElementById("modal_user_name").value = bo_name;
                     await $('.submit_btn').prop('href', 'javascript:update_section();');
-                    await $('#auth_selectBox').val(`${id}`).prop('selected', true);
                     
+                    document.getElementById("auth_selectBox").disabled = "disabled";
                     $('.under_section_table').empty();
-                    for(let i = 0; i < sections.length; i++) {
-                        add_under_section();
-                        document.getElementById(`under_input_${i + 1}`).value = sections[i];
+                    if (!(sections[0] === null)) {
+                        for(let i = 0; i < sections.length; i++) {
+                            add_under_section();
+                            document.getElementById(`under_input_${i + 1}`).value = sections[i];
+                        }
                     }
                 }
                 await modalOn();
@@ -769,16 +890,97 @@ $(document).ready(function() {
         }
     );
 
+    function base_convert(number, frombase, tobase) {
+        //  discuss at: http://phpjs.org/functions/base_convert/
+        // original by: Philippe Baumann
+        // improved by: Rafał Kukawski (http://blog.kukawski.pl)
+        //   example 1: base_convert('A37334', 16, 2);
+        //   returns 1: '101000110111001100110100'
 
-
-    
-    
-    
-
-
+        return parseInt(number + '', frombase | 0)
+            .toString(tobase | 0);
+    }
 </script>
 
+<script>
+    // $(function() {
+    //     $(document).on("click", ".btn_add_submenu", function() {
+    //         var code = $(this).closest("tr").find("input[name='code[]']").val().substr(0, 2);
+    //         add_submenu(code);
+    //     });
 
+    //     $(document).on("click", ".btn_del_menu", function() {
+    //         if (!confirm("메뉴를 삭제하시겠습니까?\n메뉴 삭제후 메뉴설정의 확인 버튼을 눌러 메뉴를 저장해 주세요."))
+    //             return false;
+
+    //         var $tr = $(this).closest("tr");
+    //         if ($tr.find("td.sub_menu_class").length > 0) {
+    //             $tr.remove();
+    //         } else {
+    //             var code = $(this).closest("tr").find("input[name='code[]']").val().substr(0, 2);
+    //             $("tr.menu_group_" + code).remove();
+    //         }
+
+    //         if ($("#menulist tr.menu_list").length < 1) {
+    //             var list = "<tr id=\"empty_menu_list\"><td colspan=\"<?php echo $colspan; ?>\" class=\"empty_table\">자료가 없습니다.</td></tr>\n";
+    //             $("#menulist table tbody").append(list);
+    //         } else {
+    //             $("#menulist tr.menu_list").each(function(index) {
+    //                 $(this).removeClass("bg0 bg1")
+    //                     .addClass("bg" + (index % 2));
+    //             });
+    //         }
+    //     });
+    // });
+
+    // // function add_menu() {
+    // //     // var max_code = base_convert(0, 10, 36);
+    // //     // $("#menulist tr.menu_list").each(function() {
+    // //     //     var me_code = $(this).find("input[name='code[]']").val().substr(0, 2);
+    // //     //     if (max_code < me_code)
+    // //     //         max_code = me_code;
+    // //     // });
+
+    // //     var url = "./menu_form.php?code=" + max_code + "&new=new";
+    // //     window.open(url, "add_menu", "left=100,top=100,width=550,height=650,scrollbars=yes,resizable=yes");
+    // //     return false;
+    // // }
+
+    // function add_submenu(code) {
+    //     var url = "./menu_form.php?code=" + code;
+    //     window.open(url, "add_menu", "left=100,top=100,width=550,height=650,scrollbars=yes,resizable=yes");
+    //     return false;
+    // }
+
+    // // function base_convert(number, frombase, tobase) {
+    // //     //  discuss at: http://phpjs.org/functions/base_convert/
+    // //     // original by: Philippe Baumann
+    // //     // improved by: Rafał Kukawski (http://blog.kukawski.pl)
+    // //     //   example 1: base_convert('A37334', 16, 2);
+    // //     //   returns 1: '101000110111001100110100'
+
+    // //     return parseInt(number + '', frombase | 0)
+    // //         .toString(tobase | 0);
+    // // }
+
+    function fmenulist_submit(f) {
+
+        var me_links = document.getElementsByName('me_link[]');
+        var reg = /^javascript/;
+
+        for (i = 0; i < me_links.length; i++) {
+
+            if (reg.test(me_links[i].value)) {
+
+                alert('링크에 자바스크립트문을 입력할수 없습니다.');
+                me_links[i].focus();
+                return false;
+            }
+        }
+
+        return false;
+    }
+</script>
 <script>
     // $(function () {
     //     //-- table td drag and drop
@@ -813,12 +1015,6 @@ $(document).ready(function() {
     //     colResizable();
     // });
 
-    $(function () {
-        
-    });
-
-    
-
     //-- table 넓이 조절
     var colResizable = function(){
         $("table").colResizable({
@@ -828,10 +1024,6 @@ $(document).ready(function() {
         });
     };
 </script>
-<style>
-    table {border-collapse: collapse;}
-    table tr th, td {border: solid 1px #AAAAAA;} 
-</style>
 
 <!-- <script src="jquery_drag_and_drop.js"></script> -->
 

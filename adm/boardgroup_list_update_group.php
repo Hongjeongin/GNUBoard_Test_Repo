@@ -2,107 +2,90 @@
 require_once './_common.php';
 
 /**
- * se_name >> gr_id
- * under_sections >> bo_subject
- * se_id >> gr_1
- * original_gr_id
+ * bo_table(새 섹션 이름)
+ * under_sections(하위섹션들) >> me_name에 저장해야함
+ * se_id(섹션타입 이름) >> bo_1에 저장해야함
+ * me_code 필요
+ * me_link 필요
+ * 
+ * 
+ * original_bo_table(기존 섹션 이름)
+ * gr_id는 G5_BASE_PATH와 url 비교 -- 추후에
  */
 
 if ($_POST['under_sections']) {
     try {
         // gr_1 찾기
-        $sql = "select se_no from g5_sections where se_id = '{$_POST['se_id']}';";
-        $gr_1 = sql_fetch($sql);
+        // $sql = "select se_no from g5_sections where se_id = '{$_POST['se_id']}';";
+        // $gr_1 = sql_fetch($sql);
 
-        // 이미 있는 섹션이면 리턴 업데이트 불가능
-        if ($_POST['original_gr_id'] !== $_POST['se_name']) {
-            $sql2 = "select * from {$g5['group_table']} where gr_id = '{$_POST['se_name']}'";
+        // 이미 있는 섹션(board)이면 리턴 업데이트 불가능
+        if ($_POST['original_bo_table'] !== $_POST['bo_table']) {
+            $sql2 = "select * from {$g5['board_table']} where bo_table = '{$_POST['bo_table']}';";
             if (sql_fetch($sql2)) return false;
         }
 
-        // group(섹션) 업데이트
-        $sql = "update {$g5['group_table']} set gr_id = '{$_POST['se_name']}', gr_1 = '{$gr_1['se_no']}', gr_subject = '{$_POST['se_name']}' where gr_id = '{$_POST['original_gr_id']}';";
+        // me_link 가져오기
+
+        // board(섹션) 업데이트
+        // 이름, 순서(bo_3)
+        $sql = "update {$g5['board_table']} set bo_table = '{$_POST['bo_table']}', bo_3 = '{$_POST['bo_3']}' where bo_table = '{$_POST['original_bo_table']}';";
         sql_query($sql);
 
-        // 기존 board(하위 섹션) 지우기
-        $sql = "delete from {$g5['board_table']} where gr_id = '{$_POST['original_gr_id']}';";
+        // 기존 menu(하위 섹션) 지우기
+        // 기존 섹션타입이름과 그룹아이디가 필요함
+        $sql = "delete from {$g5['menu_table']} where bo_table = '{$_POST['original_bo_table']}';";
         sql_query($sql);
 
-        // 새 board(하위 섹션) 저장
+        $sql4 = "SELECT MAX(CAST(me_code AS UNSIGNED)) AS me_code FROM {$g5['menu_table']};";
+        $result3 = sql_fetch($sql4);
+
+        $me_code = intval($result3['me_code']) + 10;
+
+        // 새 menu(하위 섹션) 저장
         for ($i = 0; $i < count($_POST['under_sections']); $i++) {
-            $sql3 = "insert into {$g5['board_table']}(
-                        gr_id,
-                        bo_subject,
-                        bo_device,
-                        bo_count_delete,
-                        bo_count_modify,
-                        bo_gallery_cols,
-                        bo_gallery_width,
-                        bo_gallery_height,
-                        bo_mobile_gallery_width,
-                        bo_mobile_gallery_height,
-                        bo_table_width,
-                        bo_subject_len,
-                        bo_mobile_subject_len,
-                        bo_new,
-                        bo_hot,
-                        bo_image_width,
-                        bo_upload_count,
-                        bo_upload_size,
-                        bo_reply_order,
-                        bo_use_search,
-                        bo_skin,
-                        bo_mobile_skin,
-                        bo_use_secret)
+            $sql3 = "insert into {$g5['menu_table']}(
+                        me_code,
+                        me_name,
+                        me_link,
+                        bo_table
+                    )
                     values (
-                        '{$_POST['se_name']}',
+                        $me_code,
                         '{$_POST['under_sections'][$i]}',
-                        'both',
-                        '1',
-                        '1',
-                        '4',
-                        '202',
-                        '150',
-                        '125',
-                        '100',
-                        '100',
-                        '60',
-                        '30',
-                        '24', 
-                        '100',
-                        '600',
-                        '2',
-                        '1048576',
-                        '1',
-                        '1',
-                        'basic',
-                        'basic',
-                        '0');";
-
+                        '{$_POST['me_link']}',
+                        '{$_POST['bo_table']}'
+                    );";
             $result = sql_query($sql3);
             $hello = sql_fetch($result);
         }
+        echo 'success';
+    } catch(Exception $e) {
+        echo $e;
+    }
+} else if($_POST['bo_table']) {
+    try {
+        $sql = "delete from {$g5['board_table']} where bo_table = '{$_POST['bo_table']}';";
+        $result = sql_query($sql);
+        if (!$result) return false;
 
-        
+        $sql2 = "delete from {$g5['menu_table']} where bo_table = '{$_POST['bo_table']}';";
+        $result2 = sql_query($sql2);
 
         echo 'success';
     } catch(Exception $e) {
         echo $e;
     }
-} else if($_POST['gr_id']) {
+} else if($_POST['sections']) {
     try {
-        echo json_encode($_POST['gr_id']);
-
-        $sql = "delete from {$g5['group_table']} where gr_id = '{$_POST['gr_id']}';";
-
-        $result = sql_query($sql);
-        if (!$result) echo json_encode($result);
-
-        $sql = "delete from {$g5['board_table']} where gr_id = '{$_POST['gr_id']}';";
-
-        $result = sql_query($sql);
-
-        echo json_encode($result);
+        for ($i = 0; $i < count($_POST['sections']); $i++) {
+            $sql = "update {$g5['board_table']}
+                    set bo_3 = '{$_POST['numbers'][$i]}'
+                    where bo_table = '{$_POST['sections'][$i]}';";
+            $result = sql_query($sql);
+            $hello = sql_fetch($result);
+        }
+        echo 'success';
     } catch(Exception $e) {
         echo $e;
     }
