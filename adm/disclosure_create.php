@@ -173,9 +173,6 @@ if ($_POST['submit']) {
     let file = obj.files[0];
     let reader = new FileReader();
 
-    console.log(file)
-    console.log(reader)
-
     reader.onload = function(e) {
       $(obj).next().attr('src', e.target.result);
       $(obj).next().show();
