@@ -110,6 +110,11 @@ if ($_POST['submit']) {
 }
 ?>
 
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+
 <form action="" method="post" enctype="multipart/form-data">
   <div class="article_container" style="width: 100%; height: 100%; display: flex;">
     <div class="tbl_frm01 tbl_wrap" style="width: 70%; border-right: 1px solid #ddd;">
@@ -130,13 +135,13 @@ if ($_POST['submit']) {
           <tr>
             <th scope="row">등록 날짜<strong class="sound_only">필수</strong></label></th>
             <td>
-              <input type="date" name="wr_datetime" required="" class="frm_input required hasDatepicker">
+              <input type="date" name="wr_datetime" required class="frm_input required hasDatepicker">
             </td>
           </tr>
           <tr>
             <th scope="row">내용<strong class="sound_only">필수</strong></label></th>
             <td>
-              <textarea name="wr_content" required class="required frm_input" style="width: 100%; height: 300px;"></textarea>
+              <textarea name="wr_content" id="summernote" required="required" class="required frm_input"></textarea>
             </td>
           </tr>
         </tbody>
@@ -162,6 +167,25 @@ if ($_POST['submit']) {
 </form>
 
 <script>
+  $(document).ready(function() {
+    $('#summernote').summernote({
+      height: 300,
+      minHeight: null,
+      maxHeight: null,
+      lang: 'ko-KR',
+      placeholder: '내용을 입력하세요',
+      toolbar: [
+        ['style', ['style']],
+        ['font', ['bold', 'underline', 'clear']],
+        ['fontname', ['fontname']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['table', ['table']],
+        ['insert', ['link'], ],
+      ],
+    });
+  });
+
   function add_file() {
     if ($('.file_container tbody tr').length >= 5) {
       alert('파일은 5개까지만 첨부 가능합니다.');
@@ -177,7 +201,6 @@ if ($_POST['submit']) {
 
     const clone = obj.cloneNode(true);
     clone.files = obj.files;
-    console.log(clone.files[0]);
 
     const html = `
     <tr>
