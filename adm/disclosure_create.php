@@ -139,34 +139,9 @@ if ($_POST['submit']) {
           </td>
         </tr>
         <tr>
-          <th scope="row">첨부파일1</th>
-          <td>
-            <input type="file" name="upload_file[]" id="upload_file">
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">첨부파일2</th>
-          <td>
-            <input type="file" name="upload_file[]" id="upload_file">
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">첨부파일3</th>
-          <td>
-            <input type="file" name="upload_file[]" id="upload_file">
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">첨부파일4</th>
-          <td>
-            <input type="file" name="upload_file[]" id="upload_file">
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">첨부파일5</th>
-          <td>
-            <input type="file" name="upload_file[]" id="upload_file">
-          </td>
+          <th scope="row">첨부파일
+            <button type="button" class="btn btn-primary btn-sm" onclick="add_file()" style="margin-left: 10px;">추가</button>
+          </th>
         </tr>
       </tbody>
     </table>
@@ -177,7 +152,41 @@ if ($_POST['submit']) {
 </form>
 
 <script>
+  function add_file() {
+    let html = '<tr>';
+    html += '<th scope="row">첨부파일</th>';
+    html += '<td>';
+    html += '<input type="file" name="upload_file[]" id="upload_file" accept=".png, .jpg, .jpeg, .gif" onchange="file_change(this)">';
+    html += '<img src="" alt="" style="width: 100px; height: 100px; margin: 10px; display: none;">';
+    html += '<button type="button" class="btn btn-danger btn-sm" onclick="delete_file(this)" style="margin: 10px;">삭제</button>';
+    html += '</td>';
 
+    if ($('input[name="upload_file[]"]').length >= 5) {
+      alert('파일은 5개까지만 업로드할 수 있습니다.');
+      return;
+    }
+
+    $('tr:last').after(html);
+  }
+
+  function file_change(obj) {
+    let file = obj.files[0];
+    let reader = new FileReader();
+
+    console.log(file)
+    console.log(reader)
+
+    reader.onload = function(e) {
+      $(obj).next().attr('src', e.target.result);
+      $(obj).next().show();
+    }
+
+    reader.readAsDataURL(file);
+  }
+
+  function delete_file(obj) {
+    $(obj).parent().parent().remove();
+  }
 </script>
 
 <?php
