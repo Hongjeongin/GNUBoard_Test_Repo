@@ -69,6 +69,11 @@ if ($_POST['submit']) {
 }
 ?>
 
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+
 <form action="" method="post" enctype="multipart/form-data">
   <div class="tbl_frm01 tbl_wrap">
     <table>
@@ -76,13 +81,13 @@ if ($_POST['submit']) {
         <tr>
           <th scope="row">제목<strong class="sound_only">필수</strong></label></th>
           <td>
-            <input type="text" name="wr_subject" required class="required frm_input" size="70" maxlength="1000">
+            <input type="text" name="wr_subject" required class="required frm_input" size="70" maxlength="1000" placeholder="제목을 입력하세요">
           </td>
         </tr>
         <tr>
           <th scope="row">내용<strong class="sound_only">필수</strong></label></th>
           <td>
-            <textarea name="wr_content" required class="required frm_input" style="width: 100%; height: 300px;"></textarea>
+            <textarea name="wr_content" id="summernote" required="required" class="required frm_input"></textarea>
           </td>
         </tr>
       </tbody>
@@ -94,7 +99,24 @@ if ($_POST['submit']) {
 </form>
 
 <script>
-
+  $(document).ready(function() {
+    $('#summernote').summernote({
+      height: 300,
+      minHeight: null,
+      maxHeight: null,
+      lang: 'ko-KR',
+      placeholder: '내용을 입력하세요',
+      toolbar: [
+        ['style', ['style']],
+        ['font', ['bold', 'underline', 'clear']],
+        ['fontname', ['fontname']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['table', ['table']],
+        ['insert', ['link'], ],
+      ],
+    });
+  });
 </script>
 
 <?php
