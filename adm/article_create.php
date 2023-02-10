@@ -1,12 +1,12 @@
 <?php
-$sub_menu = "200200";
+$sub_menu = "200820";
 require_once './_common.php';
 
-$g5['title'] = '공시 작성';
+$g5['title'] = '기사 작성';
 require_once './admin.head.php';
 
 if ($_POST['submit']) {
-  $table_name = 'g5_write_notice';
+  $table_name = 'g5_write_free';
 
   $wr = array(
     'wr_num' => 0,
@@ -107,7 +107,7 @@ if ($_POST['submit']) {
   }
 
   if ($wr_result && ($upload_file_result || count($count) == 0)) {
-    alert('등록되었습니다.', './disclosure.php');
+    alert('등록되었습니다.', './article_create.php');
   } else {
     alert('등록에 실패했습니다.');
   }
@@ -125,21 +125,36 @@ if ($_POST['submit']) {
       <table>
         <tbody>
           <tr>
-            <th scope="row">공시 제목<strong class="sound_only">필수</strong></label></th>
+            <th scope="row">미디어 선택<strong class="sound_only">필수</strong></label>
+              <button type="button" class="btn btn_03" onclick="add_file()" style="float: right;">추가</button>
+            </th>
+
             <td>
-              <input type="text" name="wr_subject" required class="required frm_input" size="70" maxlength="1000" placeholder="공시 제목을 입력하세요">
+              <!--  -->
             </td>
           </tr>
           <tr>
-            <th scope="row">작성자<strong class="sound_only">필수</strong></label></th>
+            <th scope="row">제목<strong class="sound_only">필수</strong></label></th>
             <td>
-              <input type="text" name="wr_name" required class="required frm_input" size="70" maxlength="1000" placeholder="작성자를 입력하세요">
+              <input type="text" name="wr_subject" required class="required frm_input" size="70" maxlength="1000" placeholder="기사 제목을 입력하세요">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">부제목</label></th>
+            <td>
+              <input type="text" name="ㅁㄴㅇ" class="frm_input" size="70" maxlength="1000">
             </td>
           </tr>
           <tr>
             <th scope="row">등록 날짜<strong class="sound_only">필수</strong></label></th>
             <td>
               <input type="date" name="wr_datetime" required class="frm_input required hasDatepicker">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">기사 링크 (URL)</th>
+            <td>
+              <input type="text" name="ㅁㄴㅇ" class="frm_input" size="70" maxlength="1000">
             </td>
           </tr>
           <tr>
