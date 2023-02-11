@@ -396,8 +396,9 @@ $colspan = 10;
                 <h2>삭제하시겠습니까?<h2>
             </div>
 
-            <div class="middle_fix">
+            <div class="evenly_fix">
                 <a href="javascript:delete_();" class="btn btn_03 submit_btn_">삭제</a>
+                <a href="javascript:modal_Off();" class="btn btn_03">취소</a>
             </div>
         </div>
     </div>
