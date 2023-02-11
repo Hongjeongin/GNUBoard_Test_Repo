@@ -13,7 +13,6 @@ if ($_POST['no'] ) {
         }
         
     } catch(Exception $e) {
-        echo $e;
     }
 } else if ($_POST['gr_id']) {
     try {
@@ -23,7 +22,6 @@ if ($_POST['no'] ) {
         $result = sql_fetch($sql);
         echo json_encode($result);
     } catch(Exception $e) {
-        echo $e;
     }
 } else {
     try {
@@ -32,7 +30,6 @@ if ($_POST['no'] ) {
         $result = sql_fetch($sql);
         echo json_encode($result);
     } catch(Exception $e) {
-        echo $e;
     }
 }
 ?>

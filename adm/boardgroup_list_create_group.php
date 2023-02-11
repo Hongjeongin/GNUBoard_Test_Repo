@@ -137,7 +137,6 @@ if ($_POST['under_sections']) {
         
         echo 'success';
     } catch(Exception $e) {
-        echo $e;
     }
 }
 ?>
