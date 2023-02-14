@@ -1,5 +1,5 @@
 <?php
-$sub_menu = "200300";
+$sub_menu = "200830";
 require_once './_common.php';
 
 auth_check_menu($auth, $sub_menu, 'r');
@@ -72,10 +72,23 @@ $intercept_count = $row['cnt'];
 
 $listall = '<a href="' . $_SERVER['SCRIPT_NAME'] . '" class="ov_listall">전체목록</a>';
 
-$g5['title'] = '회원 리스트';
+$g5['title'] = '미디어 가입';
 require_once './admin.head.php';
 
-$sql = " select * {$sql_common}  {$sql_search} {$sql_order} limit {$from_record}, {$rows}";
+echo '<script>';
+echo 'console.log("'.$member['mb_id'].'");';
+echo '</script>';
+
+// 그룹을 전체 다 조회
+// for문 돌면서 그룹 전체 보여주기
+// 만약 해당 그룹 이름을 가진 group_member에 사용자가 있다면
+// 아니라면
+
+// 해당 사용자가 group_member에 level이 있다면
+// 아니라면
+
+// $sql = " select * {$sql_common}  {$sql_search} {$sql_order} limit {$from_record}, {$rows}";
+$sql = "select * from {$g5['group_table']}";
 
 $result = sql_query($sql);
 
@@ -137,17 +150,17 @@ $colspan = 16;
                         <label for="chkall" class="sound_only">회원 전체</label>
                         <input type="checkbox" name="chkall" value="1" id="chkall" onclick="check_all(this.form)">
                     </th> -->
-                    <th scope="col" id="mb_list_name"><?php echo subject_sort_link('mb_name') ?>번호</a></th>
-                    <th scope="col" id="mb_list_nick"><?php echo subject_sort_link('mb_nick') ?>회원명</a></th>
-                    <th scope="col" rowspan="2" id="mb_list_cert"><?php echo subject_sort_link('mb_certify', '', 'desc') ?>아이디</a></th>
-                    <th scope="col" id="mb_list_mailc"><?php echo subject_sort_link('mb_email_certify', '', 'desc') ?>이메일</a></th>
+                    <th scope="col" id="mb_list_name"><?php echo subject_sort_link('mb_name') ?>미디어명</a></th>
+                    <th scope="col" id="mb_list_nick"><?php echo subject_sort_link('mb_nick') ?>URL</a></th>
+                    <!-- <th scope="col" rowspan="2" id="mb_list_cert"><?php echo subject_sort_link('mb_certify', '', 'desc') ?>아이디</a></th>
+                    <th scope="col" id="mb_list_mailc"><?php echo subject_sort_link('mb_email_certify', '', 'desc') ?>이메일</a></th> -->
                     <!-- <th scope="col" id="mb_list_open"><?php echo subject_sort_link('mb_open', '', 'desc') ?>정보공개</a></th> -->
-                    <th scope="col" id="mb_list_mailr"><?php echo subject_sort_link('mb_mailling', '', 'desc') ?>회원등급</a></th>
+                    <!-- <th scope="col" id="mb_list_mailr"><?php echo subject_sort_link('mb_mailling', '', 'desc') ?>회원등급</a></th> -->
                     <!-- <th scope="col" id="mb_list_auth">상태</th>
                     <th scope="col" id="mb_list_mobile">휴대폰</th>
                     <th scope="col" id="mb_list_lastcall"><?php echo subject_sort_link('mb_today_login', '', 'desc') ?>최종접속</a></th>
                     <th scope="col" id="mb_list_grp">접근그룹</th> -->
-                    <th scope="col" rowspan="2" id="mb_list_mng">관리</th>
+                    <th scope="col" rowspan="2" id="mb_list_mng">가입 신청</th>
                 </tr>
                 <!-- <tr>
                     <th scope="col" id="mb_list_name"><?php echo subject_sort_link('mb_name') ?>번호</a></th>
@@ -167,25 +180,29 @@ $colspan = 16;
                 for ($i = 0; $row = sql_fetch_array($result); $i++) {
                     $num += 1;
                     // 접근가능한 그룹수
-                    $sql2 = " select count(*) as cnt from {$g5['group_member_table']} where mb_id = '{$row['mb_id']}' ";
+                    // $sql2 = " select count(*) as cnt from {$g5['group_member_table']} where mb_id = '{$row['mb_id']}' ";
+                    // $row2 = sql_fetch($sql2);
+
+                    // $group = '';
+                    // if ($row2['cnt']) {
+                    //     $group = '<a href="./boardgroupmember_form.php?mb_id=' . $row['mb_id'] . '">' . $row2['cnt'] . '</a>';
+                    // }
+                    // hello
+
+                    $sql2 = "select *
+                             from {$g5['group_member_table']}
+                             where mb_id = '{$member['mb_id']}'
+                             and gr_id = '{$row['gr_id']}'";
                     $row2 = sql_fetch($sql2);
 
-                    $group = '';
-                    if ($row2['cnt']) {
-                        $group = '<a href="./boardgroupmember_form.php?mb_id=' . $row['mb_id'] . '">' . $row2['cnt'] . '</a>';
-                    }
-
-                    if ($row['mb_level'] > 8) {
-                        $s_inf = '<button id="select_'.$row['mb_id'].'" class="btn btn_01 btn-modal">확인</button>';
-                        
-                        $s_mod = '';
-                        $s_grp = '';
+                    // 가입하지 않은 사용자
+                    if (!($row2['gm_id'])) {
+                        // 가입 신청하기 버튼 띄우기
+                        $s_inf = '<button id="select_'.$row['mb_id'].'" class="btn btn_01 btn-modal">가입 신청하기</button>';
+                    // 가입 완료한 사용자
                     } else {
-                        $s_inf = '';
-                        // $s_mod = '<a href="./member_form.php?' . $qstr . '&amp;w=u&amp;mb_id=' . $row['mb_id'] . '" class="btn btn_03">수정</a>';
-                        $s_mod = '<button id="modify_'.$row['mb_id'].'" class="btn btn_03 btn-modal">수정</button>';
-                        // $s_grp = '<a href="./boardgroupmember_form.php?mb_id=' . $row['mb_id'] . '" class="btn btn_02">삭제</a>';
-                        $s_grp = '<button id="delete_'.$row['mb_id'].'" class="btn btn_02 btn-modal">삭제</button>';
+                        // 가입 완료 text 띄우기
+                        $s_inf = '<p>가입 완료</p>';
                     }
 
                     // if ($is_admin == 'group') {
@@ -307,14 +324,14 @@ $colspan = 16;
                         <!-- <td headers="mb_list_mng" rowspan="2" class="td_mng td_mng_s"><?php echo $s_mod ?><?php echo $s_grp ?></td> 
                     </tr>-->
                     <tr class="<?php echo $bg; ?>">
-                        <td headers="mb_list_name"><?php echo $i + 1;?></td>
+                        <td headers="mb_list_name"><?php echo $row['gr_subject'];?></td>
                         <!-- <td headers="mb_list_nick" class="td_mbname"><?php echo get_text($row['mb_name']); ?></td> -->
-                        <td headers="mb_list_nick"><?php echo get_text($row['mb_name']); ?></td>
+                        <td headers="mb_list_nick"><?php echo 'hello@hello.com' ?></td>
                         <!-- <td headers="mb_list_cert" class="td_name sv_use">
                             <div><?php echo get_text($row['mb_id']); ?></div>
                         </td> -->
-                        <td headers="mb_list_cert"><?php echo get_text($row['mb_id']);?></td>
-                        <td headers="mb_list_mailc"><?php echo get_text($row['mb_email']); ?></td>
+                        <!-- <td headers="mb_list_cert"><?php echo get_text($row['mb_id']);?></td>
+                        <td headers="mb_list_mailc"><?php echo get_text($row['mb_email']); ?></td> -->
 
                         <!-- <td headers="mb_list_sms">
                             <label for="mb_sms_<?php echo $i; ?>" class="sound_only">SMS수신</label>
@@ -330,7 +347,7 @@ $colspan = 16;
                                 <label for="mb_intercept_date_<?php echo $i; ?>" class="sound_only">접근차단</label>
                             <?php } ?>
                         </td> -->
-                        <td headers="mb_list_mailr" class="td_mbstat">
+                        <!-- <td headers="mb_list_mailr" class="td_mbstat">
                             <?php
                                 $level = $row['mb_level'];
                                 if ($level > 9) {
@@ -343,14 +360,12 @@ $colspan = 16;
                                     echo $authArray[0];
                                 }
                             ?>
-                        </td>
+                        </td> -->
                         <!-- <td headers="mb_list_tel" class="td_tel"><?php echo get_text($row['mb_tel']); ?></td> -->
                         <!-- <td headers="mb_list_join" class="td_date"><?php echo substr($row['mb_datetime'], 2, 8); ?></td> -->
                         <!-- <td headers="mb_list_point" class="td_num"><a href="point_list.php?sfl=mb_id&amp;stx=<?php echo $row['mb_id'] ?>"><?php echo number_format($row['mb_point']) ?></a></td> -->
-                        <td headers="mb_list_mng" colspan="2" class="td_mng td_mng_s"><?php echo $s_inf ?><?php echo $s_mod ?><?php echo $s_grp ?></td>
-
+                        <td headers="mb_list_mng" colspan="2" class="td_mng td_mng_s"><?php echo $s_inf ?></td>
                     </tr>
-
                 <?php
                 }
                 setcookie('memberListPageIndex', "{$num}");

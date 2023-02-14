@@ -1,10 +1,14 @@
 <?php
-$sub_menu = "300200";
+// $sub_menu = "300200";
+$sub_menu = "200810";
 require_once './_common.php';
 
 auth_check_menu($auth, $sub_menu, 'r');
 
 $gr = get_group($gr_id);
+
+
+
 if (!$gr['gr_id']) {
     alert('존재하지 않는 그룹입니다.');
 }

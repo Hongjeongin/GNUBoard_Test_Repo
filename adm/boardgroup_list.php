@@ -393,7 +393,7 @@ $colspan = 10;
         <div class="close-area_">X</div>
         <div class="content">
             <div>
-                <h2>삭제하시겠습니까?<h2>
+                <h2>해당 섹션을 삭제하시겠습니까?<h2>
             </div>
 
             <div class="evenly_fix">

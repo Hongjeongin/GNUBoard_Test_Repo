@@ -1,10 +1,10 @@
 <?php
-$sub_menu = "200300";
+$sub_menu = "200310";
 require_once './_common.php';
 
 auth_check_menu($auth, $sub_menu, 'r');
 
-$authArray = ['일반회원', '기자', '미디어 관리자', '최고관리자'];
+// $authArray = ['일반회원', '기자', '미디어 관리자', '최고관리자'];
 
 $sql_common = " from {$g5['member_table']} ";
 
@@ -72,7 +72,7 @@ $intercept_count = $row['cnt'];
 
 $listall = '<a href="' . $_SERVER['SCRIPT_NAME'] . '" class="ov_listall">전체목록</a>';
 
-$g5['title'] = '회원 리스트';
+$g5['title'] = '기자 리스트';
 require_once './admin.head.php';
 
 $sql = " select * {$sql_common}  {$sql_search} {$sql_order} limit {$from_record}, {$rows}";
@@ -142,7 +142,7 @@ $colspan = 16;
                     <th scope="col" rowspan="2" id="mb_list_cert"><?php echo subject_sort_link('mb_certify', '', 'desc') ?>아이디</a></th>
                     <th scope="col" id="mb_list_mailc"><?php echo subject_sort_link('mb_email_certify', '', 'desc') ?>이메일</a></th>
                     <!-- <th scope="col" id="mb_list_open"><?php echo subject_sort_link('mb_open', '', 'desc') ?>정보공개</a></th> -->
-                    <th scope="col" id="mb_list_mailr"><?php echo subject_sort_link('mb_mailling', '', 'desc') ?>회원등급</a></th>
+                    <!-- <th scope="col" id="mb_list_mailr"><?php echo subject_sort_link('mb_mailling', '', 'desc') ?>회원등급</a></th> -->
                     <!-- <th scope="col" id="mb_list_auth">상태</th>
                     <th scope="col" id="mb_list_mobile">휴대폰</th>
                     <th scope="col" id="mb_list_lastcall"><?php echo subject_sort_link('mb_today_login', '', 'desc') ?>최종접속</a></th>
@@ -330,7 +330,7 @@ $colspan = 16;
                                 <label for="mb_intercept_date_<?php echo $i; ?>" class="sound_only">접근차단</label>
                             <?php } ?>
                         </td> -->
-                        <td headers="mb_list_mailr" class="td_mbstat">
+                        <!-- <td headers="mb_list_mailr" class="td_mbstat">
                             <?php
                                 $level = $row['mb_level'];
                                 if ($level > 9) {
@@ -343,7 +343,7 @@ $colspan = 16;
                                     echo $authArray[0];
                                 }
                             ?>
-                        </td>
+                        </td> -->
                         <!-- <td headers="mb_list_tel" class="td_tel"><?php echo get_text($row['mb_tel']); ?></td> -->
                         <!-- <td headers="mb_list_join" class="td_date"><?php echo substr($row['mb_datetime'], 2, 8); ?></td> -->
                         <!-- <td headers="mb_list_point" class="td_num"><a href="point_list.php?sfl=mb_id&amp;stx=<?php echo $row['mb_id'] ?>"><?php echo number_format($row['mb_point']) ?></a></td> -->
