@@ -124,13 +124,13 @@ if ($_POST['submit']) {
     <div class="tbl_frm01 tbl_wrap" style="width: 70%; border-right: 1px solid #ddd;">
       <table>
         <tbody>
-          <tr>
+          <tr sty>
             <th scope="row">미디어 선택<strong class="sound_only">필수</strong></label>
-              <button type="button" class="btn btn_03" onclick="add_file()" style="float: right;">추가</button>
+              <button type="button" class="btn btn_03" onclick="add_media()" style="display: right;">추가</button>
             </th>
-
             <td>
-              <!--  -->
+
+
             </td>
           </tr>
           <tr>
