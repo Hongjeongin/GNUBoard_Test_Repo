@@ -1196,6 +1196,11 @@ input[type="text"]{max-width:200px}
     justify-content: center;
 }
 
+.evenly_fix {
+    display: flex;
+    justify-content: space-evenly;
+}
+
 /* 추가 23.02.08 */
 #modal_.modal-overlay_ {
     width: 100%;
